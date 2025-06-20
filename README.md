@@ -10,7 +10,7 @@ It is generated with [Stainless](https://www.stainless.com/).
 
 ## Documentation
 
-The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [docs.bey.dev](https://docs.bey.dev/introduction). The full API of this library can be found in [api.md](api.md).
 
 ## Installation
 
@@ -34,7 +34,12 @@ client = Bey(
     api_key=os.environ.get("BEY_API_KEY"),  # This is the default and can be omitted
 )
 
-developer_agent_responses = client.agent.list()
+session = client.session.create(
+    avatar_id="01234567-89ab-cdef-0123-456789abcdef",
+    livekit_token="<your-livekit-token>",
+    livekit_url="wss://<your-domain>.livekit.cloud",
+)
+print(session.id)
 ```
 
 While you can provide an `api_key` keyword argument,
@@ -57,7 +62,12 @@ client = AsyncBey(
 
 
 async def main() -> None:
-    developer_agent_responses = await client.agent.list()
+    session = await client.session.create(
+        avatar_id="01234567-89ab-cdef-0123-456789abcdef",
+        livekit_token="<your-livekit-token>",
+        livekit_url="wss://<your-domain>.livekit.cloud",
+    )
+    print(session.id)
 
 
 asyncio.run(main())
