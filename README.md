@@ -16,7 +16,7 @@ The REST API documentation can be found on [docs.bey.dev](https://docs.bey.dev).
 
 ```sh
 # install from PyPI
-pip install --pre bey
+pip install bey
 ```
 
 ## Usage
@@ -80,7 +80,7 @@ You can enable this by installing `aiohttp`:
 
 ```sh
 # install from PyPI
-pip install --pre bey[aiohttp]
+pip install bey[aiohttp]
 ```
 
 Then you can enable it by instantiating the client with `http_client=DefaultAioHttpClient()`:
