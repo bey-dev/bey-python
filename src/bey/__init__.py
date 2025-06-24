@@ -5,14 +5,23 @@ import typing as _t
 from . import types
 from ._types import NOT_GIVEN, Omit, NoneType, NotGiven, Transport, ProxiesTypes
 from ._utils import file_from_path
-from ._client import Bey, Client, Stream, Timeout, AsyncBey, Transport, AsyncClient, AsyncStream, RequestOptions
+from ._client import (
+    Client,
+    Stream,
+    Timeout,
+    Transport,
+    AsyncClient,
+    AsyncStream,
+    BeyondPresence,
+    RequestOptions,
+    AsyncBeyondPresence,
+)
 from ._models import BaseModel
 from ._version import __title__, __version__
 from ._response import APIResponse as APIResponse, AsyncAPIResponse as AsyncAPIResponse
 from ._constants import DEFAULT_TIMEOUT, DEFAULT_MAX_RETRIES, DEFAULT_CONNECTION_LIMITS
 from ._exceptions import (
     APIError,
-    BeyError,
     ConflictError,
     NotFoundError,
     APIStatusError,
@@ -21,12 +30,13 @@ from ._exceptions import (
     BadRequestError,
     APIConnectionError,
     AuthenticationError,
+    BeyondPresenceError,
     InternalServerError,
     PermissionDeniedError,
     UnprocessableEntityError,
     APIResponseValidationError,
 )
-from ._base_client import DefaultHttpxClient, DefaultAsyncHttpxClient
+from ._base_client import DefaultHttpxClient, DefaultAioHttpClient, DefaultAsyncHttpxClient
 from ._utils._logs import setup_logging as _setup_logging
 
 __all__ = [
@@ -39,7 +49,7 @@ __all__ = [
     "NotGiven",
     "NOT_GIVEN",
     "Omit",
-    "BeyError",
+    "BeyondPresenceError",
     "APIError",
     "APIStatusError",
     "APITimeoutError",
@@ -59,8 +69,8 @@ __all__ = [
     "AsyncClient",
     "Stream",
     "AsyncStream",
-    "Bey",
-    "AsyncBey",
+    "BeyondPresence",
+    "AsyncBeyondPresence",
     "file_from_path",
     "BaseModel",
     "DEFAULT_TIMEOUT",
@@ -68,6 +78,7 @@ __all__ = [
     "DEFAULT_CONNECTION_LIMITS",
     "DefaultHttpxClient",
     "DefaultAsyncHttpxClient",
+    "DefaultAioHttpClient",
 ]
 
 if not _t.TYPE_CHECKING:

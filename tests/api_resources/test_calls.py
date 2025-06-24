@@ -7,7 +7,7 @@ from typing import Any, cast
 
 import pytest
 
-from bey import Bey, AsyncBey
+from bey import BeyondPresence, AsyncBeyondPresence
 from bey.types import CallListResponse, CallListMessagesResponse
 from tests.utils import assert_matches_type
 
@@ -19,13 +19,13 @@ class TestCalls:
 
     @pytest.mark.skip()
     @parametrize
-    def test_method_list(self, client: Bey) -> None:
+    def test_method_list(self, client: BeyondPresence) -> None:
         call = client.calls.list()
         assert_matches_type(CallListResponse, call, path=["response"])
 
     @pytest.mark.skip()
     @parametrize
-    def test_raw_response_list(self, client: Bey) -> None:
+    def test_raw_response_list(self, client: BeyondPresence) -> None:
         response = client.calls.with_raw_response.list()
 
         assert response.is_closed is True
@@ -35,7 +35,7 @@ class TestCalls:
 
     @pytest.mark.skip()
     @parametrize
-    def test_streaming_response_list(self, client: Bey) -> None:
+    def test_streaming_response_list(self, client: BeyondPresence) -> None:
         with client.calls.with_streaming_response.list() as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -47,7 +47,7 @@ class TestCalls:
 
     @pytest.mark.skip()
     @parametrize
-    def test_method_list_messages(self, client: Bey) -> None:
+    def test_method_list_messages(self, client: BeyondPresence) -> None:
         call = client.calls.list_messages(
             "call_id",
         )
@@ -55,7 +55,7 @@ class TestCalls:
 
     @pytest.mark.skip()
     @parametrize
-    def test_raw_response_list_messages(self, client: Bey) -> None:
+    def test_raw_response_list_messages(self, client: BeyondPresence) -> None:
         response = client.calls.with_raw_response.list_messages(
             "call_id",
         )
@@ -67,7 +67,7 @@ class TestCalls:
 
     @pytest.mark.skip()
     @parametrize
-    def test_streaming_response_list_messages(self, client: Bey) -> None:
+    def test_streaming_response_list_messages(self, client: BeyondPresence) -> None:
         with client.calls.with_streaming_response.list_messages(
             "call_id",
         ) as response:
@@ -81,7 +81,7 @@ class TestCalls:
 
     @pytest.mark.skip()
     @parametrize
-    def test_path_params_list_messages(self, client: Bey) -> None:
+    def test_path_params_list_messages(self, client: BeyondPresence) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `call_id` but received ''"):
             client.calls.with_raw_response.list_messages(
                 "",
@@ -89,17 +89,19 @@ class TestCalls:
 
 
 class TestAsyncCalls:
-    parametrize = pytest.mark.parametrize("async_client", [False, True], indirect=True, ids=["loose", "strict"])
+    parametrize = pytest.mark.parametrize(
+        "async_client", [False, True, {"http_client": "aiohttp"}], indirect=True, ids=["loose", "strict", "aiohttp"]
+    )
 
     @pytest.mark.skip()
     @parametrize
-    async def test_method_list(self, async_client: AsyncBey) -> None:
+    async def test_method_list(self, async_client: AsyncBeyondPresence) -> None:
         call = await async_client.calls.list()
         assert_matches_type(CallListResponse, call, path=["response"])
 
     @pytest.mark.skip()
     @parametrize
-    async def test_raw_response_list(self, async_client: AsyncBey) -> None:
+    async def test_raw_response_list(self, async_client: AsyncBeyondPresence) -> None:
         response = await async_client.calls.with_raw_response.list()
 
         assert response.is_closed is True
@@ -109,7 +111,7 @@ class TestAsyncCalls:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_streaming_response_list(self, async_client: AsyncBey) -> None:
+    async def test_streaming_response_list(self, async_client: AsyncBeyondPresence) -> None:
         async with async_client.calls.with_streaming_response.list() as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -121,7 +123,7 @@ class TestAsyncCalls:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_method_list_messages(self, async_client: AsyncBey) -> None:
+    async def test_method_list_messages(self, async_client: AsyncBeyondPresence) -> None:
         call = await async_client.calls.list_messages(
             "call_id",
         )
@@ -129,7 +131,7 @@ class TestAsyncCalls:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_raw_response_list_messages(self, async_client: AsyncBey) -> None:
+    async def test_raw_response_list_messages(self, async_client: AsyncBeyondPresence) -> None:
         response = await async_client.calls.with_raw_response.list_messages(
             "call_id",
         )
@@ -141,7 +143,7 @@ class TestAsyncCalls:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_streaming_response_list_messages(self, async_client: AsyncBey) -> None:
+    async def test_streaming_response_list_messages(self, async_client: AsyncBeyondPresence) -> None:
         async with async_client.calls.with_streaming_response.list_messages(
             "call_id",
         ) as response:
@@ -155,7 +157,7 @@ class TestAsyncCalls:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_path_params_list_messages(self, async_client: AsyncBey) -> None:
+    async def test_path_params_list_messages(self, async_client: AsyncBeyondPresence) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `call_id` but received ''"):
             await async_client.calls.with_raw_response.list_messages(
                 "",

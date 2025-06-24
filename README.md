@@ -1,8 +1,8 @@
-# Bey Python API library
+# Beyond Presence Python API library
 
 [![PyPI version](<https://img.shields.io/pypi/v/bey.svg?label=pypi%20(stable)>)](https://pypi.org/project/bey/)
 
-The Bey Python library provides convenient access to the Bey REST API from any Python 3.8+
+The Beyond Presence Python library provides convenient access to the Beyond Presence REST API from any Python 3.8+
 application. The library includes type definitions for all request params and response fields,
 and offers both synchronous and asynchronous clients powered by [httpx](https://github.com/encode/httpx).
 
@@ -10,17 +10,14 @@ It is generated with [Stainless](https://www.stainless.com/).
 
 ## Documentation
 
-The REST API documentation can be found on [docs.bey.dev](https://docs.bey.dev/introduction). The full API of this library can be found in [api.md](api.md).
+The REST API documentation can be found on [docs.bey.dev](https://docs.bey.dev). The full API of this library can be found in [api.md](api.md).
 
 ## Installation
 
 ```sh
-# install from this staging repo
-pip install git+ssh://git@github.com/stainless-sdks/bey-python.git
+# install from PyPI
+pip install bey
 ```
-
-> [!NOTE]
-> Once this package is [published to PyPI](https://app.stainless.com/docs/guides/publish), this will become: `pip install --pre bey`
 
 ## Usage
 
@@ -28,9 +25,9 @@ The full API of this library can be found in [api.md](api.md).
 
 ```python
 import os
-from bey import Bey
+from bey import BeyondPresence
 
-client = Bey(
+client = BeyondPresence(
     api_key=os.environ.get("BEY_API_KEY"),  # This is the default and can be omitted
 )
 
@@ -49,14 +46,14 @@ so that your API Key is not stored in source control.
 
 ## Async usage
 
-Simply import `AsyncBey` instead of `Bey` and use `await` with each API call:
+Simply import `AsyncBeyondPresence` instead of `BeyondPresence` and use `await` with each API call:
 
 ```python
 import os
 import asyncio
-from bey import AsyncBey
+from bey import AsyncBeyondPresence
 
-client = AsyncBey(
+client = AsyncBeyondPresence(
     api_key=os.environ.get("BEY_API_KEY"),  # This is the default and can be omitted
 )
 
@@ -74,6 +71,42 @@ asyncio.run(main())
 ```
 
 Functionality between the synchronous and asynchronous clients is otherwise identical.
+
+### With aiohttp
+
+By default, the async client uses `httpx` for HTTP requests. However, for improved concurrency performance you may also use `aiohttp` as the HTTP backend.
+
+You can enable this by installing `aiohttp`:
+
+```sh
+# install from PyPI
+pip install bey[aiohttp]
+```
+
+Then you can enable it by instantiating the client with `http_client=DefaultAioHttpClient()`:
+
+```python
+import os
+import asyncio
+from bey import DefaultAioHttpClient
+from bey import AsyncBeyondPresence
+
+
+async def main() -> None:
+    async with AsyncBeyondPresence(
+        api_key=os.environ.get("BEY_API_KEY"),  # This is the default and can be omitted
+        http_client=DefaultAioHttpClient(),
+    ) as client:
+        session = await client.session.create(
+            avatar_id="01234567-89ab-cdef-0123-456789abcdef",
+            livekit_token="<your-livekit-token>",
+            livekit_url="wss://<your-domain>.livekit.cloud",
+        )
+        print(session.id)
+
+
+asyncio.run(main())
+```
 
 ## Using types
 
@@ -95,9 +128,9 @@ All errors inherit from `bey.APIError`.
 
 ```python
 import bey
-from bey import Bey
+from bey import BeyondPresence
 
-client = Bey()
+client = BeyondPresence()
 
 try:
     client.agent.list()
@@ -134,10 +167,10 @@ Connection errors (for example, due to a network connectivity problem), 408 Requ
 You can use the `max_retries` option to configure or disable retry settings:
 
 ```python
-from bey import Bey
+from bey import BeyondPresence
 
 # Configure the default for all requests:
-client = Bey(
+client = BeyondPresence(
     # default is 2
     max_retries=0,
 )
@@ -152,16 +185,16 @@ By default requests time out after 1 minute. You can configure this with a `time
 which accepts a float or an [`httpx.Timeout`](https://www.python-httpx.org/advanced/timeouts/#fine-tuning-the-configuration) object:
 
 ```python
-from bey import Bey
+from bey import BeyondPresence
 
 # Configure the default for all requests:
-client = Bey(
+client = BeyondPresence(
     # 20 seconds (default is 1 minute)
     timeout=20.0,
 )
 
 # More granular control:
-client = Bey(
+client = BeyondPresence(
     timeout=httpx.Timeout(60.0, read=5.0, write=10.0, connect=2.0),
 )
 
@@ -179,10 +212,10 @@ Note that requests that time out are [retried twice by default](#retries).
 
 We use the standard library [`logging`](https://docs.python.org/3/library/logging.html) module.
 
-You can enable logging by setting the environment variable `BEY_LOG` to `info`.
+You can enable logging by setting the environment variable `BEYOND_PRESENCE_LOG` to `info`.
 
 ```shell
-$ export BEY_LOG=info
+$ export BEYOND_PRESENCE_LOG=info
 ```
 
 Or to `debug` for more verbose logging.
@@ -204,9 +237,9 @@ if response.my_field is None:
 The "raw" Response object can be accessed by prefixing `.with_raw_response.` to any HTTP method call, e.g.,
 
 ```py
-from bey import Bey
+from bey import BeyondPresence
 
-client = Bey()
+client = BeyondPresence()
 response = client.agent.with_raw_response.list()
 print(response.headers.get('X-My-Header'))
 
@@ -214,9 +247,9 @@ agent = response.parse()  # get the object that `agent.list()` would have return
 print(agent)
 ```
 
-These methods return an [`APIResponse`](https://github.com/stainless-sdks/bey-python/tree/main/src/bey/_response.py) object.
+These methods return an [`APIResponse`](https://github.com/bey-dev/bey-python/tree/main/src/bey/_response.py) object.
 
-The async client returns an [`AsyncAPIResponse`](https://github.com/stainless-sdks/bey-python/tree/main/src/bey/_response.py) with the same structure, the only difference being `await`able methods for reading the response content.
+The async client returns an [`AsyncAPIResponse`](https://github.com/bey-dev/bey-python/tree/main/src/bey/_response.py) with the same structure, the only difference being `await`able methods for reading the response content.
 
 #### `.with_streaming_response`
 
@@ -278,10 +311,10 @@ You can directly override the [httpx client](https://www.python-httpx.org/api/#c
 
 ```python
 import httpx
-from bey import Bey, DefaultHttpxClient
+from bey import BeyondPresence, DefaultHttpxClient
 
-client = Bey(
-    # Or use the `BEY_BASE_URL` env var
+client = BeyondPresence(
+    # Or use the `BEYOND_PRESENCE_BASE_URL` env var
     base_url="http://my.test.server.example.com:8083",
     http_client=DefaultHttpxClient(
         proxy="http://my.test.proxy.example.com",
@@ -301,9 +334,9 @@ client.with_options(http_client=DefaultHttpxClient(...))
 By default the library closes underlying HTTP connections whenever the client is [garbage collected](https://docs.python.org/3/reference/datamodel.html#object.__del__). You can manually close the client using the `.close()` method if desired, or with a context manager that closes when exiting.
 
 ```py
-from bey import Bey
+from bey import BeyondPresence
 
-with Bey() as client:
+with BeyondPresence() as client:
   # make requests here
   ...
 
@@ -320,7 +353,7 @@ This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) con
 
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
 
-We are keen for your feedback; please open an [issue](https://www.github.com/stainless-sdks/bey-python/issues) with questions, bugs, or suggestions.
+We are keen for your feedback; please open an [issue](https://www.github.com/bey-dev/bey-python/issues) with questions, bugs, or suggestions.
 
 ### Determining the installed version
 

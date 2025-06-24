@@ -18,11 +18,11 @@ __all__ = [
 ]
 
 
-class BeyError(Exception):
+class BeyondPresenceError(Exception):
     pass
 
 
-class APIError(BeyError):
+class APIError(BeyondPresenceError):
     message: str
     request: httpx.Request
 

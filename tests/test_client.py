@@ -21,10 +21,10 @@ import pytest
 from respx import MockRouter
 from pydantic import ValidationError
 
-from bey import Bey, AsyncBey, APIResponseValidationError
+from bey import BeyondPresence, AsyncBeyondPresence, APIResponseValidationError
 from bey._types import Omit
 from bey._models import BaseModel, FinalRequestOptions
-from bey._exceptions import BeyError, APIStatusError, APITimeoutError, APIResponseValidationError
+from bey._exceptions import APIStatusError, APITimeoutError, BeyondPresenceError, APIResponseValidationError
 from bey._base_client import (
     DEFAULT_TIMEOUT,
     HTTPX_DEFAULT_TIMEOUT,
@@ -50,7 +50,7 @@ def _low_retry_timeout(*_args: Any, **_kwargs: Any) -> float:
     return 0.1
 
 
-def _get_open_connections(client: Bey | AsyncBey) -> int:
+def _get_open_connections(client: BeyondPresence | AsyncBeyondPresence) -> int:
     transport = client._client._transport
     assert isinstance(transport, httpx.HTTPTransport) or isinstance(transport, httpx.AsyncHTTPTransport)
 
@@ -58,8 +58,8 @@ def _get_open_connections(client: Bey | AsyncBey) -> int:
     return len(pool._requests)
 
 
-class TestBey:
-    client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+class TestBeyondPresence:
+    client = BeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
 
     @pytest.mark.respx(base_url=base_url)
     def test_raw_response(self, respx_mock: MockRouter) -> None:
@@ -106,7 +106,7 @@ class TestBey:
         assert isinstance(self.client.timeout, httpx.Timeout)
 
     def test_copy_default_headers(self) -> None:
-        client = Bey(
+        client = BeyondPresence(
             base_url=base_url, api_key=api_key, _strict_response_validation=True, default_headers={"X-Foo": "bar"}
         )
         assert client.default_headers["X-Foo"] == "bar"
@@ -140,7 +140,9 @@ class TestBey:
             client.copy(set_default_headers={}, default_headers={"X-Foo": "Bar"})
 
     def test_copy_default_query(self) -> None:
-        client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True, default_query={"foo": "bar"})
+        client = BeyondPresence(
+            base_url=base_url, api_key=api_key, _strict_response_validation=True, default_query={"foo": "bar"}
+        )
         assert _get_params(client)["foo"] == "bar"
 
         # does not override the already given value when not specified
@@ -189,6 +191,7 @@ class TestBey:
             copy_param = copy_signature.parameters.get(name)
             assert copy_param is not None, f"copy() signature is missing the {name} param"
 
+    @pytest.mark.skipif(sys.version_info >= (3, 10), reason="fails because of a memory leak that started from 3.12")
     def test_copy_build_request(self) -> None:
         options = FinalRequestOptions(method="get", url="/foo")
 
@@ -263,7 +266,9 @@ class TestBey:
         assert timeout == httpx.Timeout(100.0)
 
     def test_client_timeout_option(self) -> None:
-        client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True, timeout=httpx.Timeout(0))
+        client = BeyondPresence(
+            base_url=base_url, api_key=api_key, _strict_response_validation=True, timeout=httpx.Timeout(0)
+        )
 
         request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
         timeout = httpx.Timeout(**request.extensions["timeout"])  # type: ignore
@@ -272,7 +277,9 @@ class TestBey:
     def test_http_client_timeout_option(self) -> None:
         # custom timeout given to the httpx client should be used
         with httpx.Client(timeout=None) as http_client:
-            client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True, http_client=http_client)
+            client = BeyondPresence(
+                base_url=base_url, api_key=api_key, _strict_response_validation=True, http_client=http_client
+            )
 
             request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
             timeout = httpx.Timeout(**request.extensions["timeout"])  # type: ignore
@@ -280,7 +287,9 @@ class TestBey:
 
         # no timeout given to the httpx client should not use the httpx default
         with httpx.Client() as http_client:
-            client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True, http_client=http_client)
+            client = BeyondPresence(
+                base_url=base_url, api_key=api_key, _strict_response_validation=True, http_client=http_client
+            )
 
             request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
             timeout = httpx.Timeout(**request.extensions["timeout"])  # type: ignore
@@ -288,7 +297,9 @@ class TestBey:
 
         # explicitly passing the default timeout currently results in it being ignored
         with httpx.Client(timeout=HTTPX_DEFAULT_TIMEOUT) as http_client:
-            client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True, http_client=http_client)
+            client = BeyondPresence(
+                base_url=base_url, api_key=api_key, _strict_response_validation=True, http_client=http_client
+            )
 
             request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
             timeout = httpx.Timeout(**request.extensions["timeout"])  # type: ignore
@@ -297,7 +308,7 @@ class TestBey:
     async def test_invalid_http_client(self) -> None:
         with pytest.raises(TypeError, match="Invalid `http_client` arg"):
             async with httpx.AsyncClient() as http_client:
-                Bey(
+                BeyondPresence(
                     base_url=base_url,
                     api_key=api_key,
                     _strict_response_validation=True,
@@ -305,14 +316,14 @@ class TestBey:
                 )
 
     def test_default_headers_option(self) -> None:
-        client = Bey(
+        client = BeyondPresence(
             base_url=base_url, api_key=api_key, _strict_response_validation=True, default_headers={"X-Foo": "bar"}
         )
         request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
         assert request.headers.get("x-foo") == "bar"
         assert request.headers.get("x-stainless-lang") == "python"
 
-        client2 = Bey(
+        client2 = BeyondPresence(
             base_url=base_url,
             api_key=api_key,
             _strict_response_validation=True,
@@ -326,17 +337,17 @@ class TestBey:
         assert request.headers.get("x-stainless-lang") == "my-overriding-header"
 
     def test_validate_headers(self) -> None:
-        client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+        client = BeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
         request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
         assert request.headers.get("x-api-key") == api_key
 
-        with pytest.raises(BeyError):
+        with pytest.raises(BeyondPresenceError):
             with update_env(**{"BEY_API_KEY": Omit()}):
-                client2 = Bey(base_url=base_url, api_key=None, _strict_response_validation=True)
+                client2 = BeyondPresence(base_url=base_url, api_key=None, _strict_response_validation=True)
             _ = client2
 
     def test_default_query_option(self) -> None:
-        client = Bey(
+        client = BeyondPresence(
             base_url=base_url, api_key=api_key, _strict_response_validation=True, default_query={"query_param": "bar"}
         )
         request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
@@ -450,7 +461,7 @@ class TestBey:
         params = dict(request.url.params)
         assert params == {"foo": "2"}
 
-    def test_multipart_repeating_array(self, client: Bey) -> None:
+    def test_multipart_repeating_array(self, client: BeyondPresence) -> None:
         request = client._build_request(
             FinalRequestOptions.construct(
                 method="get",
@@ -537,7 +548,9 @@ class TestBey:
         assert response.foo == 2
 
     def test_base_url_setter(self) -> None:
-        client = Bey(base_url="https://example.com/from_init", api_key=api_key, _strict_response_validation=True)
+        client = BeyondPresence(
+            base_url="https://example.com/from_init", api_key=api_key, _strict_response_validation=True
+        )
         assert client.base_url == "https://example.com/from_init/"
 
         client.base_url = "https://example.com/from_setter"  # type: ignore[assignment]
@@ -545,15 +558,17 @@ class TestBey:
         assert client.base_url == "https://example.com/from_setter/"
 
     def test_base_url_env(self) -> None:
-        with update_env(BEY_BASE_URL="http://localhost:5000/from/env"):
-            client = Bey(api_key=api_key, _strict_response_validation=True)
+        with update_env(BEYOND_PRESENCE_BASE_URL="http://localhost:5000/from/env"):
+            client = BeyondPresence(api_key=api_key, _strict_response_validation=True)
             assert client.base_url == "http://localhost:5000/from/env/"
 
     @pytest.mark.parametrize(
         "client",
         [
-            Bey(base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True),
-            Bey(
+            BeyondPresence(
+                base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True
+            ),
+            BeyondPresence(
                 base_url="http://localhost:5000/custom/path/",
                 api_key=api_key,
                 _strict_response_validation=True,
@@ -562,7 +577,7 @@ class TestBey:
         ],
         ids=["standard", "custom http client"],
     )
-    def test_base_url_trailing_slash(self, client: Bey) -> None:
+    def test_base_url_trailing_slash(self, client: BeyondPresence) -> None:
         request = client._build_request(
             FinalRequestOptions(
                 method="post",
@@ -575,8 +590,10 @@ class TestBey:
     @pytest.mark.parametrize(
         "client",
         [
-            Bey(base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True),
-            Bey(
+            BeyondPresence(
+                base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True
+            ),
+            BeyondPresence(
                 base_url="http://localhost:5000/custom/path/",
                 api_key=api_key,
                 _strict_response_validation=True,
@@ -585,7 +602,7 @@ class TestBey:
         ],
         ids=["standard", "custom http client"],
     )
-    def test_base_url_no_trailing_slash(self, client: Bey) -> None:
+    def test_base_url_no_trailing_slash(self, client: BeyondPresence) -> None:
         request = client._build_request(
             FinalRequestOptions(
                 method="post",
@@ -598,8 +615,10 @@ class TestBey:
     @pytest.mark.parametrize(
         "client",
         [
-            Bey(base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True),
-            Bey(
+            BeyondPresence(
+                base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True
+            ),
+            BeyondPresence(
                 base_url="http://localhost:5000/custom/path/",
                 api_key=api_key,
                 _strict_response_validation=True,
@@ -608,7 +627,7 @@ class TestBey:
         ],
         ids=["standard", "custom http client"],
     )
-    def test_absolute_request_url(self, client: Bey) -> None:
+    def test_absolute_request_url(self, client: BeyondPresence) -> None:
         request = client._build_request(
             FinalRequestOptions(
                 method="post",
@@ -619,7 +638,7 @@ class TestBey:
         assert request.url == "https://myapi.com/foo"
 
     def test_copied_client_does_not_close_http(self) -> None:
-        client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+        client = BeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
         assert not client.is_closed()
 
         copied = client.copy()
@@ -630,7 +649,7 @@ class TestBey:
         assert not client.is_closed()
 
     def test_client_context_manager(self) -> None:
-        client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+        client = BeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
         with client as c2:
             assert c2 is client
             assert not c2.is_closed()
@@ -651,7 +670,9 @@ class TestBey:
 
     def test_client_max_retries_validation(self) -> None:
         with pytest.raises(TypeError, match=r"max_retries cannot be None"):
-            Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True, max_retries=cast(Any, None))
+            BeyondPresence(
+                base_url=base_url, api_key=api_key, _strict_response_validation=True, max_retries=cast(Any, None)
+            )
 
     @pytest.mark.respx(base_url=base_url)
     def test_received_text_for_expected_json(self, respx_mock: MockRouter) -> None:
@@ -660,12 +681,12 @@ class TestBey:
 
         respx_mock.get("/foo").mock(return_value=httpx.Response(200, text="my-custom-format"))
 
-        strict_client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+        strict_client = BeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
 
         with pytest.raises(APIResponseValidationError):
             strict_client.get("/foo", cast_to=Model)
 
-        client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=False)
+        client = BeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=False)
 
         response = client.get("/foo", cast_to=Model)
         assert isinstance(response, str)  # type: ignore[unreachable]
@@ -693,7 +714,7 @@ class TestBey:
     )
     @mock.patch("time.time", mock.MagicMock(return_value=1696004797))
     def test_parse_retry_after_header(self, remaining_retries: int, retry_after: str, timeout: float) -> None:
-        client = Bey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+        client = BeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
 
         headers = httpx.Headers({"retry-after": retry_after})
         options = FinalRequestOptions(method="get", url="/foo", max_retries=3)
@@ -702,7 +723,7 @@ class TestBey:
 
     @mock.patch("bey._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
-    def test_retrying_timeout_errors_doesnt_leak(self, respx_mock: MockRouter, client: Bey) -> None:
+    def test_retrying_timeout_errors_doesnt_leak(self, respx_mock: MockRouter, client: BeyondPresence) -> None:
         respx_mock.get("/v1/agent").mock(side_effect=httpx.TimeoutException("Test timeout error"))
 
         with pytest.raises(APITimeoutError):
@@ -712,7 +733,7 @@ class TestBey:
 
     @mock.patch("bey._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
-    def test_retrying_status_errors_doesnt_leak(self, respx_mock: MockRouter, client: Bey) -> None:
+    def test_retrying_status_errors_doesnt_leak(self, respx_mock: MockRouter, client: BeyondPresence) -> None:
         respx_mock.get("/v1/agent").mock(return_value=httpx.Response(500))
 
         with pytest.raises(APIStatusError):
@@ -725,7 +746,7 @@ class TestBey:
     @pytest.mark.parametrize("failure_mode", ["status", "exception"])
     def test_retries_taken(
         self,
-        client: Bey,
+        client: BeyondPresence,
         failures_before_success: int,
         failure_mode: Literal["status", "exception"],
         respx_mock: MockRouter,
@@ -753,7 +774,9 @@ class TestBey:
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
     @mock.patch("bey._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
-    def test_omit_retry_count_header(self, client: Bey, failures_before_success: int, respx_mock: MockRouter) -> None:
+    def test_omit_retry_count_header(
+        self, client: BeyondPresence, failures_before_success: int, respx_mock: MockRouter
+    ) -> None:
         client = client.with_options(max_retries=4)
 
         nb_retries = 0
@@ -775,7 +798,7 @@ class TestBey:
     @mock.patch("bey._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     def test_overwrite_retry_count_header(
-        self, client: Bey, failures_before_success: int, respx_mock: MockRouter
+        self, client: BeyondPresence, failures_before_success: int, respx_mock: MockRouter
     ) -> None:
         client = client.with_options(max_retries=4)
 
@@ -844,8 +867,8 @@ class TestBey:
         assert exc_info.value.response.headers["Location"] == f"{base_url}/redirected"
 
 
-class TestAsyncBey:
-    client = AsyncBey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+class TestAsyncBeyondPresence:
+    client = AsyncBeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
 
     @pytest.mark.respx(base_url=base_url)
     @pytest.mark.asyncio
@@ -894,7 +917,7 @@ class TestAsyncBey:
         assert isinstance(self.client.timeout, httpx.Timeout)
 
     def test_copy_default_headers(self) -> None:
-        client = AsyncBey(
+        client = AsyncBeyondPresence(
             base_url=base_url, api_key=api_key, _strict_response_validation=True, default_headers={"X-Foo": "bar"}
         )
         assert client.default_headers["X-Foo"] == "bar"
@@ -928,7 +951,7 @@ class TestAsyncBey:
             client.copy(set_default_headers={}, default_headers={"X-Foo": "Bar"})
 
     def test_copy_default_query(self) -> None:
-        client = AsyncBey(
+        client = AsyncBeyondPresence(
             base_url=base_url, api_key=api_key, _strict_response_validation=True, default_query={"foo": "bar"}
         )
         assert _get_params(client)["foo"] == "bar"
@@ -979,6 +1002,7 @@ class TestAsyncBey:
             copy_param = copy_signature.parameters.get(name)
             assert copy_param is not None, f"copy() signature is missing the {name} param"
 
+    @pytest.mark.skipif(sys.version_info >= (3, 10), reason="fails because of a memory leak that started from 3.12")
     def test_copy_build_request(self) -> None:
         options = FinalRequestOptions(method="get", url="/foo")
 
@@ -1053,7 +1077,7 @@ class TestAsyncBey:
         assert timeout == httpx.Timeout(100.0)
 
     async def test_client_timeout_option(self) -> None:
-        client = AsyncBey(
+        client = AsyncBeyondPresence(
             base_url=base_url, api_key=api_key, _strict_response_validation=True, timeout=httpx.Timeout(0)
         )
 
@@ -1064,7 +1088,7 @@ class TestAsyncBey:
     async def test_http_client_timeout_option(self) -> None:
         # custom timeout given to the httpx client should be used
         async with httpx.AsyncClient(timeout=None) as http_client:
-            client = AsyncBey(
+            client = AsyncBeyondPresence(
                 base_url=base_url, api_key=api_key, _strict_response_validation=True, http_client=http_client
             )
 
@@ -1074,7 +1098,7 @@ class TestAsyncBey:
 
         # no timeout given to the httpx client should not use the httpx default
         async with httpx.AsyncClient() as http_client:
-            client = AsyncBey(
+            client = AsyncBeyondPresence(
                 base_url=base_url, api_key=api_key, _strict_response_validation=True, http_client=http_client
             )
 
@@ -1084,7 +1108,7 @@ class TestAsyncBey:
 
         # explicitly passing the default timeout currently results in it being ignored
         async with httpx.AsyncClient(timeout=HTTPX_DEFAULT_TIMEOUT) as http_client:
-            client = AsyncBey(
+            client = AsyncBeyondPresence(
                 base_url=base_url, api_key=api_key, _strict_response_validation=True, http_client=http_client
             )
 
@@ -1095,7 +1119,7 @@ class TestAsyncBey:
     def test_invalid_http_client(self) -> None:
         with pytest.raises(TypeError, match="Invalid `http_client` arg"):
             with httpx.Client() as http_client:
-                AsyncBey(
+                AsyncBeyondPresence(
                     base_url=base_url,
                     api_key=api_key,
                     _strict_response_validation=True,
@@ -1103,14 +1127,14 @@ class TestAsyncBey:
                 )
 
     def test_default_headers_option(self) -> None:
-        client = AsyncBey(
+        client = AsyncBeyondPresence(
             base_url=base_url, api_key=api_key, _strict_response_validation=True, default_headers={"X-Foo": "bar"}
         )
         request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
         assert request.headers.get("x-foo") == "bar"
         assert request.headers.get("x-stainless-lang") == "python"
 
-        client2 = AsyncBey(
+        client2 = AsyncBeyondPresence(
             base_url=base_url,
             api_key=api_key,
             _strict_response_validation=True,
@@ -1124,17 +1148,17 @@ class TestAsyncBey:
         assert request.headers.get("x-stainless-lang") == "my-overriding-header"
 
     def test_validate_headers(self) -> None:
-        client = AsyncBey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+        client = AsyncBeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
         request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
         assert request.headers.get("x-api-key") == api_key
 
-        with pytest.raises(BeyError):
+        with pytest.raises(BeyondPresenceError):
             with update_env(**{"BEY_API_KEY": Omit()}):
-                client2 = AsyncBey(base_url=base_url, api_key=None, _strict_response_validation=True)
+                client2 = AsyncBeyondPresence(base_url=base_url, api_key=None, _strict_response_validation=True)
             _ = client2
 
     def test_default_query_option(self) -> None:
-        client = AsyncBey(
+        client = AsyncBeyondPresence(
             base_url=base_url, api_key=api_key, _strict_response_validation=True, default_query={"query_param": "bar"}
         )
         request = client._build_request(FinalRequestOptions(method="get", url="/foo"))
@@ -1248,7 +1272,7 @@ class TestAsyncBey:
         params = dict(request.url.params)
         assert params == {"foo": "2"}
 
-    def test_multipart_repeating_array(self, async_client: AsyncBey) -> None:
+    def test_multipart_repeating_array(self, async_client: AsyncBeyondPresence) -> None:
         request = async_client._build_request(
             FinalRequestOptions.construct(
                 method="get",
@@ -1335,7 +1359,9 @@ class TestAsyncBey:
         assert response.foo == 2
 
     def test_base_url_setter(self) -> None:
-        client = AsyncBey(base_url="https://example.com/from_init", api_key=api_key, _strict_response_validation=True)
+        client = AsyncBeyondPresence(
+            base_url="https://example.com/from_init", api_key=api_key, _strict_response_validation=True
+        )
         assert client.base_url == "https://example.com/from_init/"
 
         client.base_url = "https://example.com/from_setter"  # type: ignore[assignment]
@@ -1343,15 +1369,17 @@ class TestAsyncBey:
         assert client.base_url == "https://example.com/from_setter/"
 
     def test_base_url_env(self) -> None:
-        with update_env(BEY_BASE_URL="http://localhost:5000/from/env"):
-            client = AsyncBey(api_key=api_key, _strict_response_validation=True)
+        with update_env(BEYOND_PRESENCE_BASE_URL="http://localhost:5000/from/env"):
+            client = AsyncBeyondPresence(api_key=api_key, _strict_response_validation=True)
             assert client.base_url == "http://localhost:5000/from/env/"
 
     @pytest.mark.parametrize(
         "client",
         [
-            AsyncBey(base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True),
-            AsyncBey(
+            AsyncBeyondPresence(
+                base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True
+            ),
+            AsyncBeyondPresence(
                 base_url="http://localhost:5000/custom/path/",
                 api_key=api_key,
                 _strict_response_validation=True,
@@ -1360,7 +1388,7 @@ class TestAsyncBey:
         ],
         ids=["standard", "custom http client"],
     )
-    def test_base_url_trailing_slash(self, client: AsyncBey) -> None:
+    def test_base_url_trailing_slash(self, client: AsyncBeyondPresence) -> None:
         request = client._build_request(
             FinalRequestOptions(
                 method="post",
@@ -1373,8 +1401,10 @@ class TestAsyncBey:
     @pytest.mark.parametrize(
         "client",
         [
-            AsyncBey(base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True),
-            AsyncBey(
+            AsyncBeyondPresence(
+                base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True
+            ),
+            AsyncBeyondPresence(
                 base_url="http://localhost:5000/custom/path/",
                 api_key=api_key,
                 _strict_response_validation=True,
@@ -1383,7 +1413,7 @@ class TestAsyncBey:
         ],
         ids=["standard", "custom http client"],
     )
-    def test_base_url_no_trailing_slash(self, client: AsyncBey) -> None:
+    def test_base_url_no_trailing_slash(self, client: AsyncBeyondPresence) -> None:
         request = client._build_request(
             FinalRequestOptions(
                 method="post",
@@ -1396,8 +1426,10 @@ class TestAsyncBey:
     @pytest.mark.parametrize(
         "client",
         [
-            AsyncBey(base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True),
-            AsyncBey(
+            AsyncBeyondPresence(
+                base_url="http://localhost:5000/custom/path/", api_key=api_key, _strict_response_validation=True
+            ),
+            AsyncBeyondPresence(
                 base_url="http://localhost:5000/custom/path/",
                 api_key=api_key,
                 _strict_response_validation=True,
@@ -1406,7 +1438,7 @@ class TestAsyncBey:
         ],
         ids=["standard", "custom http client"],
     )
-    def test_absolute_request_url(self, client: AsyncBey) -> None:
+    def test_absolute_request_url(self, client: AsyncBeyondPresence) -> None:
         request = client._build_request(
             FinalRequestOptions(
                 method="post",
@@ -1417,7 +1449,7 @@ class TestAsyncBey:
         assert request.url == "https://myapi.com/foo"
 
     async def test_copied_client_does_not_close_http(self) -> None:
-        client = AsyncBey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+        client = AsyncBeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
         assert not client.is_closed()
 
         copied = client.copy()
@@ -1429,7 +1461,7 @@ class TestAsyncBey:
         assert not client.is_closed()
 
     async def test_client_context_manager(self) -> None:
-        client = AsyncBey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+        client = AsyncBeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
         async with client as c2:
             assert c2 is client
             assert not c2.is_closed()
@@ -1451,7 +1483,9 @@ class TestAsyncBey:
 
     async def test_client_max_retries_validation(self) -> None:
         with pytest.raises(TypeError, match=r"max_retries cannot be None"):
-            AsyncBey(base_url=base_url, api_key=api_key, _strict_response_validation=True, max_retries=cast(Any, None))
+            AsyncBeyondPresence(
+                base_url=base_url, api_key=api_key, _strict_response_validation=True, max_retries=cast(Any, None)
+            )
 
     @pytest.mark.respx(base_url=base_url)
     @pytest.mark.asyncio
@@ -1461,12 +1495,12 @@ class TestAsyncBey:
 
         respx_mock.get("/foo").mock(return_value=httpx.Response(200, text="my-custom-format"))
 
-        strict_client = AsyncBey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+        strict_client = AsyncBeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
 
         with pytest.raises(APIResponseValidationError):
             await strict_client.get("/foo", cast_to=Model)
 
-        client = AsyncBey(base_url=base_url, api_key=api_key, _strict_response_validation=False)
+        client = AsyncBeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=False)
 
         response = await client.get("/foo", cast_to=Model)
         assert isinstance(response, str)  # type: ignore[unreachable]
@@ -1495,7 +1529,7 @@ class TestAsyncBey:
     @mock.patch("time.time", mock.MagicMock(return_value=1696004797))
     @pytest.mark.asyncio
     async def test_parse_retry_after_header(self, remaining_retries: int, retry_after: str, timeout: float) -> None:
-        client = AsyncBey(base_url=base_url, api_key=api_key, _strict_response_validation=True)
+        client = AsyncBeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=True)
 
         headers = httpx.Headers({"retry-after": retry_after})
         options = FinalRequestOptions(method="get", url="/foo", max_retries=3)
@@ -1504,7 +1538,9 @@ class TestAsyncBey:
 
     @mock.patch("bey._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
-    async def test_retrying_timeout_errors_doesnt_leak(self, respx_mock: MockRouter, async_client: AsyncBey) -> None:
+    async def test_retrying_timeout_errors_doesnt_leak(
+        self, respx_mock: MockRouter, async_client: AsyncBeyondPresence
+    ) -> None:
         respx_mock.get("/v1/agent").mock(side_effect=httpx.TimeoutException("Test timeout error"))
 
         with pytest.raises(APITimeoutError):
@@ -1514,7 +1550,9 @@ class TestAsyncBey:
 
     @mock.patch("bey._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
-    async def test_retrying_status_errors_doesnt_leak(self, respx_mock: MockRouter, async_client: AsyncBey) -> None:
+    async def test_retrying_status_errors_doesnt_leak(
+        self, respx_mock: MockRouter, async_client: AsyncBeyondPresence
+    ) -> None:
         respx_mock.get("/v1/agent").mock(return_value=httpx.Response(500))
 
         with pytest.raises(APIStatusError):
@@ -1528,7 +1566,7 @@ class TestAsyncBey:
     @pytest.mark.parametrize("failure_mode", ["status", "exception"])
     async def test_retries_taken(
         self,
-        async_client: AsyncBey,
+        async_client: AsyncBeyondPresence,
         failures_before_success: int,
         failure_mode: Literal["status", "exception"],
         respx_mock: MockRouter,
@@ -1558,7 +1596,7 @@ class TestAsyncBey:
     @pytest.mark.respx(base_url=base_url)
     @pytest.mark.asyncio
     async def test_omit_retry_count_header(
-        self, async_client: AsyncBey, failures_before_success: int, respx_mock: MockRouter
+        self, async_client: AsyncBeyondPresence, failures_before_success: int, respx_mock: MockRouter
     ) -> None:
         client = async_client.with_options(max_retries=4)
 
@@ -1582,7 +1620,7 @@ class TestAsyncBey:
     @pytest.mark.respx(base_url=base_url)
     @pytest.mark.asyncio
     async def test_overwrite_retry_count_header(
-        self, async_client: AsyncBey, failures_before_success: int, respx_mock: MockRouter
+        self, async_client: AsyncBeyondPresence, failures_before_success: int, respx_mock: MockRouter
     ) -> None:
         client = async_client.with_options(max_retries=4)
 

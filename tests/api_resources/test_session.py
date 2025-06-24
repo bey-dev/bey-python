@@ -7,7 +7,7 @@ from typing import Any, cast
 
 import pytest
 
-from bey import Bey, AsyncBey
+from bey import BeyondPresence, AsyncBeyondPresence
 from bey.types import Session, SessionListResponse
 from tests.utils import assert_matches_type
 
@@ -19,7 +19,7 @@ class TestSession:
 
     @pytest.mark.skip()
     @parametrize
-    def test_method_create(self, client: Bey) -> None:
+    def test_method_create(self, client: BeyondPresence) -> None:
         session = client.session.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             livekit_token="<your-livekit-token>",
@@ -29,7 +29,7 @@ class TestSession:
 
     @pytest.mark.skip()
     @parametrize
-    def test_raw_response_create(self, client: Bey) -> None:
+    def test_raw_response_create(self, client: BeyondPresence) -> None:
         response = client.session.with_raw_response.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             livekit_token="<your-livekit-token>",
@@ -43,7 +43,7 @@ class TestSession:
 
     @pytest.mark.skip()
     @parametrize
-    def test_streaming_response_create(self, client: Bey) -> None:
+    def test_streaming_response_create(self, client: BeyondPresence) -> None:
         with client.session.with_streaming_response.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             livekit_token="<your-livekit-token>",
@@ -59,7 +59,7 @@ class TestSession:
 
     @pytest.mark.skip()
     @parametrize
-    def test_method_retrieve(self, client: Bey) -> None:
+    def test_method_retrieve(self, client: BeyondPresence) -> None:
         session = client.session.retrieve(
             "id",
         )
@@ -67,7 +67,7 @@ class TestSession:
 
     @pytest.mark.skip()
     @parametrize
-    def test_raw_response_retrieve(self, client: Bey) -> None:
+    def test_raw_response_retrieve(self, client: BeyondPresence) -> None:
         response = client.session.with_raw_response.retrieve(
             "id",
         )
@@ -79,7 +79,7 @@ class TestSession:
 
     @pytest.mark.skip()
     @parametrize
-    def test_streaming_response_retrieve(self, client: Bey) -> None:
+    def test_streaming_response_retrieve(self, client: BeyondPresence) -> None:
         with client.session.with_streaming_response.retrieve(
             "id",
         ) as response:
@@ -93,7 +93,7 @@ class TestSession:
 
     @pytest.mark.skip()
     @parametrize
-    def test_path_params_retrieve(self, client: Bey) -> None:
+    def test_path_params_retrieve(self, client: BeyondPresence) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `id` but received ''"):
             client.session.with_raw_response.retrieve(
                 "",
@@ -101,13 +101,13 @@ class TestSession:
 
     @pytest.mark.skip()
     @parametrize
-    def test_method_list(self, client: Bey) -> None:
+    def test_method_list(self, client: BeyondPresence) -> None:
         session = client.session.list()
         assert_matches_type(SessionListResponse, session, path=["response"])
 
     @pytest.mark.skip()
     @parametrize
-    def test_raw_response_list(self, client: Bey) -> None:
+    def test_raw_response_list(self, client: BeyondPresence) -> None:
         response = client.session.with_raw_response.list()
 
         assert response.is_closed is True
@@ -117,7 +117,7 @@ class TestSession:
 
     @pytest.mark.skip()
     @parametrize
-    def test_streaming_response_list(self, client: Bey) -> None:
+    def test_streaming_response_list(self, client: BeyondPresence) -> None:
         with client.session.with_streaming_response.list() as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -129,11 +129,13 @@ class TestSession:
 
 
 class TestAsyncSession:
-    parametrize = pytest.mark.parametrize("async_client", [False, True], indirect=True, ids=["loose", "strict"])
+    parametrize = pytest.mark.parametrize(
+        "async_client", [False, True, {"http_client": "aiohttp"}], indirect=True, ids=["loose", "strict", "aiohttp"]
+    )
 
     @pytest.mark.skip()
     @parametrize
-    async def test_method_create(self, async_client: AsyncBey) -> None:
+    async def test_method_create(self, async_client: AsyncBeyondPresence) -> None:
         session = await async_client.session.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             livekit_token="<your-livekit-token>",
@@ -143,7 +145,7 @@ class TestAsyncSession:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_raw_response_create(self, async_client: AsyncBey) -> None:
+    async def test_raw_response_create(self, async_client: AsyncBeyondPresence) -> None:
         response = await async_client.session.with_raw_response.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             livekit_token="<your-livekit-token>",
@@ -157,7 +159,7 @@ class TestAsyncSession:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_streaming_response_create(self, async_client: AsyncBey) -> None:
+    async def test_streaming_response_create(self, async_client: AsyncBeyondPresence) -> None:
         async with async_client.session.with_streaming_response.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             livekit_token="<your-livekit-token>",
@@ -173,7 +175,7 @@ class TestAsyncSession:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_method_retrieve(self, async_client: AsyncBey) -> None:
+    async def test_method_retrieve(self, async_client: AsyncBeyondPresence) -> None:
         session = await async_client.session.retrieve(
             "id",
         )
@@ -181,7 +183,7 @@ class TestAsyncSession:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_raw_response_retrieve(self, async_client: AsyncBey) -> None:
+    async def test_raw_response_retrieve(self, async_client: AsyncBeyondPresence) -> None:
         response = await async_client.session.with_raw_response.retrieve(
             "id",
         )
@@ -193,7 +195,7 @@ class TestAsyncSession:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_streaming_response_retrieve(self, async_client: AsyncBey) -> None:
+    async def test_streaming_response_retrieve(self, async_client: AsyncBeyondPresence) -> None:
         async with async_client.session.with_streaming_response.retrieve(
             "id",
         ) as response:
@@ -207,7 +209,7 @@ class TestAsyncSession:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_path_params_retrieve(self, async_client: AsyncBey) -> None:
+    async def test_path_params_retrieve(self, async_client: AsyncBeyondPresence) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `id` but received ''"):
             await async_client.session.with_raw_response.retrieve(
                 "",
@@ -215,13 +217,13 @@ class TestAsyncSession:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_method_list(self, async_client: AsyncBey) -> None:
+    async def test_method_list(self, async_client: AsyncBeyondPresence) -> None:
         session = await async_client.session.list()
         assert_matches_type(SessionListResponse, session, path=["response"])
 
     @pytest.mark.skip()
     @parametrize
-    async def test_raw_response_list(self, async_client: AsyncBey) -> None:
+    async def test_raw_response_list(self, async_client: AsyncBeyondPresence) -> None:
         response = await async_client.session.with_raw_response.list()
 
         assert response.is_closed is True
@@ -231,7 +233,7 @@ class TestAsyncSession:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_streaming_response_list(self, async_client: AsyncBey) -> None:
+    async def test_streaming_response_list(self, async_client: AsyncBeyondPresence) -> None:
         async with async_client.session.with_streaming_response.list() as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
