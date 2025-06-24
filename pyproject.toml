@@ -1,11 +1,11 @@
 [project]
 name = "bey"
 version = "0.0.1-alpha.0"
-description = "The official Python library for the bey API"
+description = "The official Python library for the Beyond Presence API"
 dynamic = ["readme"]
 license = "Apache-2.0"
 authors = [
-{ name = "Bey", email = "support@beyondpresence.ai" },
+{ name = "Beyond Presence", email = "support@beyondpresence.ai" },
 ]
 dependencies = [
     "httpx>=0.23.0, <1",

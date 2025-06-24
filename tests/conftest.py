@@ -10,7 +10,7 @@ import httpx
 import pytest
 from pytest_asyncio import is_async_test
 
-from bey import Bey, AsyncBey, DefaultAioHttpClient
+from bey import BeyondPresence, AsyncBeyondPresence, DefaultAioHttpClient
 from bey._utils import is_dict
 
 if TYPE_CHECKING:
@@ -49,17 +49,17 @@ api_key = "My API Key"
 
 
 @pytest.fixture(scope="session")
-def client(request: FixtureRequest) -> Iterator[Bey]:
+def client(request: FixtureRequest) -> Iterator[BeyondPresence]:
     strict = getattr(request, "param", True)
     if not isinstance(strict, bool):
         raise TypeError(f"Unexpected fixture parameter type {type(strict)}, expected {bool}")
 
-    with Bey(base_url=base_url, api_key=api_key, _strict_response_validation=strict) as client:
+    with BeyondPresence(base_url=base_url, api_key=api_key, _strict_response_validation=strict) as client:
         yield client
 
 
 @pytest.fixture(scope="session")
-async def async_client(request: FixtureRequest) -> AsyncIterator[AsyncBey]:
+async def async_client(request: FixtureRequest) -> AsyncIterator[AsyncBeyondPresence]:
     param = getattr(request, "param", True)
 
     # defaults
@@ -78,7 +78,7 @@ async def async_client(request: FixtureRequest) -> AsyncIterator[AsyncBey]:
     else:
         raise TypeError(f"Unexpected fixture parameter type {type(param)}, expected bool or dict")
 
-    async with AsyncBey(
+    async with AsyncBeyondPresence(
         base_url=base_url, api_key=api_key, _strict_response_validation=strict, http_client=http_client
     ) as client:
         yield client

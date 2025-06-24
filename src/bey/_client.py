@@ -23,24 +23,33 @@ from ._utils import is_given, get_async_library
 from ._version import __version__
 from .resources import auth, agent, calls, avatar, session
 from ._streaming import Stream as Stream, AsyncStream as AsyncStream
-from ._exceptions import BeyError, APIStatusError
+from ._exceptions import APIStatusError, BeyondPresenceError
 from ._base_client import (
     DEFAULT_MAX_RETRIES,
     SyncAPIClient,
     AsyncAPIClient,
 )
 
-__all__ = ["Timeout", "Transport", "ProxiesTypes", "RequestOptions", "Bey", "AsyncBey", "Client", "AsyncClient"]
+__all__ = [
+    "Timeout",
+    "Transport",
+    "ProxiesTypes",
+    "RequestOptions",
+    "BeyondPresence",
+    "AsyncBeyondPresence",
+    "Client",
+    "AsyncClient",
+]
 
 
-class Bey(SyncAPIClient):
+class BeyondPresence(SyncAPIClient):
     agent: agent.AgentResource
     auth: auth.AuthResource
     avatar: avatar.AvatarResource
     calls: calls.CallsResource
     session: session.SessionResource
-    with_raw_response: BeyWithRawResponse
-    with_streaming_response: BeyWithStreamedResponse
+    with_raw_response: BeyondPresenceWithRawResponse
+    with_streaming_response: BeyondPresenceWithStreamedResponse
 
     # client options
     api_key: str
@@ -68,20 +77,20 @@ class Bey(SyncAPIClient):
         # part of our public interface in the future.
         _strict_response_validation: bool = False,
     ) -> None:
-        """Construct a new synchronous Bey client instance.
+        """Construct a new synchronous BeyondPresence client instance.
 
         This automatically infers the `api_key` argument from the `BEY_API_KEY` environment variable if it is not provided.
         """
         if api_key is None:
             api_key = os.environ.get("BEY_API_KEY")
         if api_key is None:
-            raise BeyError(
+            raise BeyondPresenceError(
                 "The api_key client option must be set either by passing api_key to the client or by setting the BEY_API_KEY environment variable"
             )
         self.api_key = api_key
 
         if base_url is None:
-            base_url = os.environ.get("BEY_BASE_URL")
+            base_url = os.environ.get("BEYOND_PRESENCE_BASE_URL")
         if base_url is None:
             base_url = f"https://api.bey.dev/"
 
@@ -101,8 +110,8 @@ class Bey(SyncAPIClient):
         self.avatar = avatar.AvatarResource(self)
         self.calls = calls.CallsResource(self)
         self.session = session.SessionResource(self)
-        self.with_raw_response = BeyWithRawResponse(self)
-        self.with_streaming_response = BeyWithStreamedResponse(self)
+        self.with_raw_response = BeyondPresenceWithRawResponse(self)
+        self.with_streaming_response = BeyondPresenceWithStreamedResponse(self)
 
     @property
     @override
@@ -209,14 +218,14 @@ class Bey(SyncAPIClient):
         return APIStatusError(err_msg, response=response, body=body)
 
 
-class AsyncBey(AsyncAPIClient):
+class AsyncBeyondPresence(AsyncAPIClient):
     agent: agent.AsyncAgentResource
     auth: auth.AsyncAuthResource
     avatar: avatar.AsyncAvatarResource
     calls: calls.AsyncCallsResource
     session: session.AsyncSessionResource
-    with_raw_response: AsyncBeyWithRawResponse
-    with_streaming_response: AsyncBeyWithStreamedResponse
+    with_raw_response: AsyncBeyondPresenceWithRawResponse
+    with_streaming_response: AsyncBeyondPresenceWithStreamedResponse
 
     # client options
     api_key: str
@@ -244,20 +253,20 @@ class AsyncBey(AsyncAPIClient):
         # part of our public interface in the future.
         _strict_response_validation: bool = False,
     ) -> None:
-        """Construct a new async AsyncBey client instance.
+        """Construct a new async AsyncBeyondPresence client instance.
 
         This automatically infers the `api_key` argument from the `BEY_API_KEY` environment variable if it is not provided.
         """
         if api_key is None:
             api_key = os.environ.get("BEY_API_KEY")
         if api_key is None:
-            raise BeyError(
+            raise BeyondPresenceError(
                 "The api_key client option must be set either by passing api_key to the client or by setting the BEY_API_KEY environment variable"
             )
         self.api_key = api_key
 
         if base_url is None:
-            base_url = os.environ.get("BEY_BASE_URL")
+            base_url = os.environ.get("BEYOND_PRESENCE_BASE_URL")
         if base_url is None:
             base_url = f"https://api.bey.dev/"
 
@@ -277,8 +286,8 @@ class AsyncBey(AsyncAPIClient):
         self.avatar = avatar.AsyncAvatarResource(self)
         self.calls = calls.AsyncCallsResource(self)
         self.session = session.AsyncSessionResource(self)
-        self.with_raw_response = AsyncBeyWithRawResponse(self)
-        self.with_streaming_response = AsyncBeyWithStreamedResponse(self)
+        self.with_raw_response = AsyncBeyondPresenceWithRawResponse(self)
+        self.with_streaming_response = AsyncBeyondPresenceWithStreamedResponse(self)
 
     @property
     @override
@@ -385,8 +394,8 @@ class AsyncBey(AsyncAPIClient):
         return APIStatusError(err_msg, response=response, body=body)
 
 
-class BeyWithRawResponse:
-    def __init__(self, client: Bey) -> None:
+class BeyondPresenceWithRawResponse:
+    def __init__(self, client: BeyondPresence) -> None:
         self.agent = agent.AgentResourceWithRawResponse(client.agent)
         self.auth = auth.AuthResourceWithRawResponse(client.auth)
         self.avatar = avatar.AvatarResourceWithRawResponse(client.avatar)
@@ -394,8 +403,8 @@ class BeyWithRawResponse:
         self.session = session.SessionResourceWithRawResponse(client.session)
 
 
-class AsyncBeyWithRawResponse:
-    def __init__(self, client: AsyncBey) -> None:
+class AsyncBeyondPresenceWithRawResponse:
+    def __init__(self, client: AsyncBeyondPresence) -> None:
         self.agent = agent.AsyncAgentResourceWithRawResponse(client.agent)
         self.auth = auth.AsyncAuthResourceWithRawResponse(client.auth)
         self.avatar = avatar.AsyncAvatarResourceWithRawResponse(client.avatar)
@@ -403,8 +412,8 @@ class AsyncBeyWithRawResponse:
         self.session = session.AsyncSessionResourceWithRawResponse(client.session)
 
 
-class BeyWithStreamedResponse:
-    def __init__(self, client: Bey) -> None:
+class BeyondPresenceWithStreamedResponse:
+    def __init__(self, client: BeyondPresence) -> None:
         self.agent = agent.AgentResourceWithStreamingResponse(client.agent)
         self.auth = auth.AuthResourceWithStreamingResponse(client.auth)
         self.avatar = avatar.AvatarResourceWithStreamingResponse(client.avatar)
@@ -412,8 +421,8 @@ class BeyWithStreamedResponse:
         self.session = session.SessionResourceWithStreamingResponse(client.session)
 
 
-class AsyncBeyWithStreamedResponse:
-    def __init__(self, client: AsyncBey) -> None:
+class AsyncBeyondPresenceWithStreamedResponse:
+    def __init__(self, client: AsyncBeyondPresence) -> None:
         self.agent = agent.AsyncAgentResourceWithStreamingResponse(client.agent)
         self.auth = auth.AsyncAuthResourceWithStreamingResponse(client.auth)
         self.avatar = avatar.AsyncAvatarResourceWithStreamingResponse(client.avatar)
@@ -421,6 +430,6 @@ class AsyncBeyWithStreamedResponse:
         self.session = session.AsyncSessionResourceWithStreamingResponse(client.session)
 
 
-Client = Bey
+Client = BeyondPresence
 
-AsyncClient = AsyncBey
+AsyncClient = AsyncBeyondPresence

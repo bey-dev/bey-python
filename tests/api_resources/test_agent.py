@@ -7,7 +7,7 @@ from typing import Any, cast
 
 import pytest
 
-from bey import Bey, AsyncBey
+from bey import BeyondPresence, AsyncBeyondPresence
 from bey.types import AgentListResponse, DeveloperAgentResponse
 from tests.utils import assert_matches_type
 
@@ -19,7 +19,7 @@ class TestAgent:
 
     @pytest.mark.skip()
     @parametrize
-    def test_method_create(self, client: Bey) -> None:
+    def test_method_create(self, client: BeyondPresence) -> None:
         agent = client.agent.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             system_prompt="You are a helpful assistant.",
@@ -28,7 +28,7 @@ class TestAgent:
 
     @pytest.mark.skip()
     @parametrize
-    def test_method_create_with_all_params(self, client: Bey) -> None:
+    def test_method_create_with_all_params(self, client: BeyondPresence) -> None:
         agent = client.agent.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             system_prompt="You are a helpful assistant.",
@@ -42,7 +42,7 @@ class TestAgent:
 
     @pytest.mark.skip()
     @parametrize
-    def test_raw_response_create(self, client: Bey) -> None:
+    def test_raw_response_create(self, client: BeyondPresence) -> None:
         response = client.agent.with_raw_response.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             system_prompt="You are a helpful assistant.",
@@ -55,7 +55,7 @@ class TestAgent:
 
     @pytest.mark.skip()
     @parametrize
-    def test_streaming_response_create(self, client: Bey) -> None:
+    def test_streaming_response_create(self, client: BeyondPresence) -> None:
         with client.agent.with_streaming_response.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             system_prompt="You are a helpful assistant.",
@@ -70,13 +70,13 @@ class TestAgent:
 
     @pytest.mark.skip()
     @parametrize
-    def test_method_list(self, client: Bey) -> None:
+    def test_method_list(self, client: BeyondPresence) -> None:
         agent = client.agent.list()
         assert_matches_type(AgentListResponse, agent, path=["response"])
 
     @pytest.mark.skip()
     @parametrize
-    def test_raw_response_list(self, client: Bey) -> None:
+    def test_raw_response_list(self, client: BeyondPresence) -> None:
         response = client.agent.with_raw_response.list()
 
         assert response.is_closed is True
@@ -86,7 +86,7 @@ class TestAgent:
 
     @pytest.mark.skip()
     @parametrize
-    def test_streaming_response_list(self, client: Bey) -> None:
+    def test_streaming_response_list(self, client: BeyondPresence) -> None:
         with client.agent.with_streaming_response.list() as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -98,7 +98,7 @@ class TestAgent:
 
     @pytest.mark.skip()
     @parametrize
-    def test_method_delete(self, client: Bey) -> None:
+    def test_method_delete(self, client: BeyondPresence) -> None:
         agent = client.agent.delete(
             "agent_id",
         )
@@ -106,7 +106,7 @@ class TestAgent:
 
     @pytest.mark.skip()
     @parametrize
-    def test_raw_response_delete(self, client: Bey) -> None:
+    def test_raw_response_delete(self, client: BeyondPresence) -> None:
         response = client.agent.with_raw_response.delete(
             "agent_id",
         )
@@ -118,7 +118,7 @@ class TestAgent:
 
     @pytest.mark.skip()
     @parametrize
-    def test_streaming_response_delete(self, client: Bey) -> None:
+    def test_streaming_response_delete(self, client: BeyondPresence) -> None:
         with client.agent.with_streaming_response.delete(
             "agent_id",
         ) as response:
@@ -132,7 +132,7 @@ class TestAgent:
 
     @pytest.mark.skip()
     @parametrize
-    def test_path_params_delete(self, client: Bey) -> None:
+    def test_path_params_delete(self, client: BeyondPresence) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `agent_id` but received ''"):
             client.agent.with_raw_response.delete(
                 "",
@@ -146,7 +146,7 @@ class TestAsyncAgent:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_method_create(self, async_client: AsyncBey) -> None:
+    async def test_method_create(self, async_client: AsyncBeyondPresence) -> None:
         agent = await async_client.agent.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             system_prompt="You are a helpful assistant.",
@@ -155,7 +155,7 @@ class TestAsyncAgent:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_method_create_with_all_params(self, async_client: AsyncBey) -> None:
+    async def test_method_create_with_all_params(self, async_client: AsyncBeyondPresence) -> None:
         agent = await async_client.agent.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             system_prompt="You are a helpful assistant.",
@@ -169,7 +169,7 @@ class TestAsyncAgent:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_raw_response_create(self, async_client: AsyncBey) -> None:
+    async def test_raw_response_create(self, async_client: AsyncBeyondPresence) -> None:
         response = await async_client.agent.with_raw_response.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             system_prompt="You are a helpful assistant.",
@@ -182,7 +182,7 @@ class TestAsyncAgent:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_streaming_response_create(self, async_client: AsyncBey) -> None:
+    async def test_streaming_response_create(self, async_client: AsyncBeyondPresence) -> None:
         async with async_client.agent.with_streaming_response.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             system_prompt="You are a helpful assistant.",
@@ -197,13 +197,13 @@ class TestAsyncAgent:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_method_list(self, async_client: AsyncBey) -> None:
+    async def test_method_list(self, async_client: AsyncBeyondPresence) -> None:
         agent = await async_client.agent.list()
         assert_matches_type(AgentListResponse, agent, path=["response"])
 
     @pytest.mark.skip()
     @parametrize
-    async def test_raw_response_list(self, async_client: AsyncBey) -> None:
+    async def test_raw_response_list(self, async_client: AsyncBeyondPresence) -> None:
         response = await async_client.agent.with_raw_response.list()
 
         assert response.is_closed is True
@@ -213,7 +213,7 @@ class TestAsyncAgent:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_streaming_response_list(self, async_client: AsyncBey) -> None:
+    async def test_streaming_response_list(self, async_client: AsyncBeyondPresence) -> None:
         async with async_client.agent.with_streaming_response.list() as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -225,7 +225,7 @@ class TestAsyncAgent:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_method_delete(self, async_client: AsyncBey) -> None:
+    async def test_method_delete(self, async_client: AsyncBeyondPresence) -> None:
         agent = await async_client.agent.delete(
             "agent_id",
         )
@@ -233,7 +233,7 @@ class TestAsyncAgent:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_raw_response_delete(self, async_client: AsyncBey) -> None:
+    async def test_raw_response_delete(self, async_client: AsyncBeyondPresence) -> None:
         response = await async_client.agent.with_raw_response.delete(
             "agent_id",
         )
@@ -245,7 +245,7 @@ class TestAsyncAgent:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_streaming_response_delete(self, async_client: AsyncBey) -> None:
+    async def test_streaming_response_delete(self, async_client: AsyncBeyondPresence) -> None:
         async with async_client.agent.with_streaming_response.delete(
             "agent_id",
         ) as response:
@@ -259,7 +259,7 @@ class TestAsyncAgent:
 
     @pytest.mark.skip()
     @parametrize
-    async def test_path_params_delete(self, async_client: AsyncBey) -> None:
+    async def test_path_params_delete(self, async_client: AsyncBeyondPresence) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `agent_id` but received ''"):
             await async_client.agent.with_raw_response.delete(
                 "",
