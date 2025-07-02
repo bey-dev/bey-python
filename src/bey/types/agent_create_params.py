@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import List, Optional
-from typing_extensions import Required, TypedDict
+from typing_extensions import Literal, Required, TypedDict
 
 from .developer_agent_capability import DeveloperAgentCapability
 
@@ -18,16 +18,54 @@ class AgentCreateParams(TypedDict, total=False):
     """The system prompt to use."""
 
     capabilities: List[DeveloperAgentCapability]
-    """The agent capabilities."""
+    """The extra capabilities to manage the call."""
 
     greeting: Optional[str]
     """What to say at the start of the session."""
 
-    language: Optional[str]
-    """The language to use."""
+    language: Optional[
+        Literal[
+            "bg",
+            "zh",
+            "cs",
+            "da",
+            "nl",
+            "en",
+            "en-AU",
+            "en-GB",
+            "en-US",
+            "fi",
+            "fr",
+            "fr-CA",
+            "fr-FR",
+            "de",
+            "el",
+            "hi",
+            "hu",
+            "id",
+            "it",
+            "ja",
+            "ko",
+            "ms",
+            "no",
+            "pl",
+            "pt",
+            "pt-BR",
+            "pt-PT",
+            "ro",
+            "ru",
+            "sk",
+            "es",
+            "sv",
+            "tr",
+            "uk",
+            "vi",
+        ]
+    ]
+    """Enum for languages with language codes as values."""
 
     max_session_length_minutes: Optional[int]
     """The maximum session length in minutes."""
 
     name: Optional[str]
-    """The agent name."""
+    """The display name to use."""
