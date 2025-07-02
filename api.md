@@ -42,17 +42,3 @@ Methods:
 
 - <code title="get /v1/calls">client.calls.<a href="./src/bey/resources/calls.py">list</a>() -> <a href="./src/bey/types/call_list_response.py">CallListResponse</a></code>
 - <code title="get /v1/calls/{call_id}/messages">client.calls.<a href="./src/bey/resources/calls.py">list_messages</a>(call_id) -> <a href="./src/bey/types/call_list_messages_response.py">CallListMessagesResponse</a></code>
-
-# Session
-
-Types:
-
-```python
-from bey.types import Session, SessionListResponse
-```
-
-Methods:
-
-- <code title="post /v1/session">client.session.<a href="./src/bey/resources/session.py">create</a>(\*\*<a href="src/bey/types/session_create_params.py">params</a>) -> <a href="./src/bey/types/session.py">Session</a></code>
-- <code title="get /v1/session/{id}">client.session.<a href="./src/bey/resources/session.py">retrieve</a>(id) -> <a href="./src/bey/types/session.py">Session</a></code>
-- <code title="get /v1/session">client.session.<a href="./src/bey/resources/session.py">list</a>() -> <a href="./src/bey/types/session_list_response.py">SessionListResponse</a></code>
