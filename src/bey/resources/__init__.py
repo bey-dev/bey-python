@@ -32,14 +32,6 @@ from .avatar import (
     AvatarResourceWithStreamingResponse,
     AsyncAvatarResourceWithStreamingResponse,
 )
-from .session import (
-    SessionResource,
-    AsyncSessionResource,
-    SessionResourceWithRawResponse,
-    AsyncSessionResourceWithRawResponse,
-    SessionResourceWithStreamingResponse,
-    AsyncSessionResourceWithStreamingResponse,
-)
 
 __all__ = [
     "AgentResource",
@@ -66,10 +58,4 @@ __all__ = [
     "AsyncCallsResourceWithRawResponse",
     "CallsResourceWithStreamingResponse",
     "AsyncCallsResourceWithStreamingResponse",
-    "SessionResource",
-    "AsyncSessionResource",
-    "SessionResourceWithRawResponse",
-    "AsyncSessionResourceWithRawResponse",
-    "SessionResourceWithStreamingResponse",
-    "AsyncSessionResourceWithStreamingResponse",
 ]
