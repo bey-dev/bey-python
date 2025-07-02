@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import List, Optional
+from typing_extensions import Literal
 
 import httpx
 
@@ -52,7 +53,46 @@ class AgentResource(SyncAPIResource):
         system_prompt: str,
         capabilities: List[DeveloperAgentCapability] | NotGiven = NOT_GIVEN,
         greeting: Optional[str] | NotGiven = NOT_GIVEN,
-        language: Optional[str] | NotGiven = NOT_GIVEN,
+        language: Optional[
+            Literal[
+                "bg",
+                "zh",
+                "cs",
+                "da",
+                "nl",
+                "en",
+                "en-AU",
+                "en-GB",
+                "en-US",
+                "fi",
+                "fr",
+                "fr-CA",
+                "fr-FR",
+                "de",
+                "el",
+                "hi",
+                "hu",
+                "id",
+                "it",
+                "ja",
+                "ko",
+                "ms",
+                "no",
+                "pl",
+                "pt",
+                "pt-BR",
+                "pt-PT",
+                "ro",
+                "ru",
+                "sk",
+                "es",
+                "sv",
+                "tr",
+                "uk",
+                "vi",
+            ]
+        ]
+        | NotGiven = NOT_GIVEN,
         max_session_length_minutes: Optional[int] | NotGiven = NOT_GIVEN,
         name: Optional[str] | NotGiven = NOT_GIVEN,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -70,15 +110,15 @@ class AgentResource(SyncAPIResource):
 
           system_prompt: The system prompt to use.
 
-          capabilities: The agent capabilities.
+          capabilities: The extra capabilities to manage the call.
 
           greeting: What to say at the start of the session.
 
-          language: The language to use.
+          language: Enum for languages with language codes as values.
 
           max_session_length_minutes: The maximum session length in minutes.
 
-          name: The agent name.
+          name: The display name to use.
 
           extra_headers: Send extra headers
 
@@ -188,7 +228,46 @@ class AsyncAgentResource(AsyncAPIResource):
         system_prompt: str,
         capabilities: List[DeveloperAgentCapability] | NotGiven = NOT_GIVEN,
         greeting: Optional[str] | NotGiven = NOT_GIVEN,
-        language: Optional[str] | NotGiven = NOT_GIVEN,
+        language: Optional[
+            Literal[
+                "bg",
+                "zh",
+                "cs",
+                "da",
+                "nl",
+                "en",
+                "en-AU",
+                "en-GB",
+                "en-US",
+                "fi",
+                "fr",
+                "fr-CA",
+                "fr-FR",
+                "de",
+                "el",
+                "hi",
+                "hu",
+                "id",
+                "it",
+                "ja",
+                "ko",
+                "ms",
+                "no",
+                "pl",
+                "pt",
+                "pt-BR",
+                "pt-PT",
+                "ro",
+                "ru",
+                "sk",
+                "es",
+                "sv",
+                "tr",
+                "uk",
+                "vi",
+            ]
+        ]
+        | NotGiven = NOT_GIVEN,
         max_session_length_minutes: Optional[int] | NotGiven = NOT_GIVEN,
         name: Optional[str] | NotGiven = NOT_GIVEN,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -206,15 +285,15 @@ class AsyncAgentResource(AsyncAPIResource):
 
           system_prompt: The system prompt to use.
 
-          capabilities: The agent capabilities.
+          capabilities: The extra capabilities to manage the call.
 
           greeting: What to say at the start of the session.
 
-          language: The language to use.
+          language: Enum for languages with language codes as values.
 
           max_session_length_minutes: The maximum session length in minutes.
 
-          name: The agent name.
+          name: The display name to use.
 
           extra_headers: Send extra headers
 
