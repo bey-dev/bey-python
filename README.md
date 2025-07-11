@@ -1,6 +1,7 @@
 # Beyond Presence Python API library
 
-[![PyPI version](<https://img.shields.io/pypi/v/bey.svg?label=pypi%20(stable)>)](https://pypi.org/project/bey/)
+<!-- prettier-ignore -->
+[![PyPI version](https://img.shields.io/pypi/v/bey.svg?label=pypi%20(stable))](https://pypi.org/project/bey/)
 
 The Beyond Presence Python library provides convenient access to the Beyond Presence REST API from any Python 3.8+
 application. The library includes type definitions for all request params and response fields,
