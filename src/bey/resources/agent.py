@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import Any, List, Optional, cast
 from typing_extensions import Literal
 
 import httpx
 
-from ..types import agent_create_params
+from ..types import agent_list_params, agent_create_params
 from .._types import NOT_GIVEN, Body, Query, Headers, NotGiven
 from .._utils import maybe_transform, async_maybe_transform
 from .._compat import cached_property
@@ -151,6 +151,8 @@ class AgentResource(SyncAPIResource):
     def list(
         self,
         *,
+        cursor: Optional[str] | NotGiven = NOT_GIVEN,
+        limit: int | NotGiven = NOT_GIVEN,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -158,13 +160,41 @@ class AgentResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
     ) -> AgentListResponse:
-        """List all agents the owner of the API key has access to."""
-        return self._get(
-            "/v1/agent",
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+        """
+        List all agents the owner of the API key has access to.
+
+        Args:
+          cursor: Cursor for pagination
+
+          limit: The maximum number of agents to return
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        return cast(
+            AgentListResponse,
+            self._get(
+                "/v1/agent",
+                options=make_request_options(
+                    extra_headers=extra_headers,
+                    extra_query=extra_query,
+                    extra_body=extra_body,
+                    timeout=timeout,
+                    query=maybe_transform(
+                        {
+                            "cursor": cursor,
+                            "limit": limit,
+                        },
+                        agent_list_params.AgentListParams,
+                    ),
+                ),
+                cast_to=cast(Any, AgentListResponse),  # Union types cannot be passed in as arguments in the type system
             ),
-            cast_to=AgentListResponse,
         )
 
     def delete(
@@ -326,6 +356,8 @@ class AsyncAgentResource(AsyncAPIResource):
     async def list(
         self,
         *,
+        cursor: Optional[str] | NotGiven = NOT_GIVEN,
+        limit: int | NotGiven = NOT_GIVEN,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -333,13 +365,41 @@ class AsyncAgentResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
     ) -> AgentListResponse:
-        """List all agents the owner of the API key has access to."""
-        return await self._get(
-            "/v1/agent",
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+        """
+        List all agents the owner of the API key has access to.
+
+        Args:
+          cursor: Cursor for pagination
+
+          limit: The maximum number of agents to return
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        return cast(
+            AgentListResponse,
+            await self._get(
+                "/v1/agent",
+                options=make_request_options(
+                    extra_headers=extra_headers,
+                    extra_query=extra_query,
+                    extra_body=extra_body,
+                    timeout=timeout,
+                    query=await async_maybe_transform(
+                        {
+                            "cursor": cursor,
+                            "limit": limit,
+                        },
+                        agent_list_params.AgentListParams,
+                    ),
+                ),
+                cast_to=cast(Any, AgentListResponse),  # Union types cannot be passed in as arguments in the type system
             ),
-            cast_to=AgentListResponse,
         )
 
     async def delete(

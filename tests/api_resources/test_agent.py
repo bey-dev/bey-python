@@ -76,6 +76,15 @@ class TestAgent:
 
     @pytest.mark.skip()
     @parametrize
+    def test_method_list_with_all_params(self, client: BeyondPresence) -> None:
+        agent = client.agent.list(
+            cursor="cursor",
+            limit=1,
+        )
+        assert_matches_type(AgentListResponse, agent, path=["response"])
+
+    @pytest.mark.skip()
+    @parametrize
     def test_raw_response_list(self, client: BeyondPresence) -> None:
         response = client.agent.with_raw_response.list()
 
@@ -199,6 +208,15 @@ class TestAsyncAgent:
     @parametrize
     async def test_method_list(self, async_client: AsyncBeyondPresence) -> None:
         agent = await async_client.agent.list()
+        assert_matches_type(AgentListResponse, agent, path=["response"])
+
+    @pytest.mark.skip()
+    @parametrize
+    async def test_method_list_with_all_params(self, async_client: AsyncBeyondPresence) -> None:
+        agent = await async_client.agent.list(
+            cursor="cursor",
+            limit=1,
+        )
         assert_matches_type(AgentListResponse, agent, path=["response"])
 
     @pytest.mark.skip()

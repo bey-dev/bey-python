@@ -25,6 +25,15 @@ class TestAvatar:
 
     @pytest.mark.skip()
     @parametrize
+    def test_method_list_with_all_params(self, client: BeyondPresence) -> None:
+        avatar = client.avatar.list(
+            cursor="cursor",
+            limit=1,
+        )
+        assert_matches_type(AvatarListResponse, avatar, path=["response"])
+
+    @pytest.mark.skip()
+    @parametrize
     def test_raw_response_list(self, client: BeyondPresence) -> None:
         response = client.avatar.with_raw_response.list()
 
@@ -55,6 +64,15 @@ class TestAsyncAvatar:
     @parametrize
     async def test_method_list(self, async_client: AsyncBeyondPresence) -> None:
         avatar = await async_client.avatar.list()
+        assert_matches_type(AvatarListResponse, avatar, path=["response"])
+
+    @pytest.mark.skip()
+    @parametrize
+    async def test_method_list_with_all_params(self, async_client: AsyncBeyondPresence) -> None:
+        avatar = await async_client.avatar.list(
+            cursor="cursor",
+            limit=1,
+        )
         assert_matches_type(AvatarListResponse, avatar, path=["response"])
 
     @pytest.mark.skip()

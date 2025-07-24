@@ -11,7 +11,7 @@ __all__ = ["DeveloperAgentResponse"]
 
 class DeveloperAgentResponse(BaseModel):
     id: str
-    """The unique identifier (ID) of this entity."""
+    """Unique identifier of the object."""
 
     avatar_id: str
     """The ID of the avatar to use."""

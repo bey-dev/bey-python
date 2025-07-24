@@ -1,28 +1,46 @@
 # File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-from typing import List, Optional
-from typing_extensions import TypeAlias
+from typing import List, Union, Optional
+from typing_extensions import Literal, TypeAlias
 
 from .._models import BaseModel
 
-__all__ = ["CallListResponse", "CallListResponseItem"]
+__all__ = [
+    "CallListResponse",
+    "_HasMorePaginationModel",
+    "HasMorePaginationModelData",
+    "_NoMorePaginationModel",
+    "NoMorePaginationModelData",
+]
 
 
-class CallListResponseItem(BaseModel):
+class HasMorePaginationModelData(BaseModel):
     id: str
-    """The ID of the call."""
-
-    agent_id: str
-    """The ID of the agent handling the call."""
-
-    ended_at: Optional[str] = None
-    """The end time of the call in ISO 8601 format.
-
-    If null, the call might still be ongoing.
-    """
-
-    started_at: str
-    """The start time of the call in ISO 8601 format."""
+    """Unique identifier of the object."""
 
 
-CallListResponse: TypeAlias = List[CallListResponseItem]
+class _HasMorePaginationModel(BaseModel):
+    data: List[HasMorePaginationModelData]
+    """The list of results."""
+
+    next_cursor: str
+    """The cursor for the next page of results."""
+
+    has_more: Optional[Literal[True]] = None
+    """Whether there are more results to fetch."""
+
+
+class NoMorePaginationModelData(BaseModel):
+    id: str
+    """Unique identifier of the object."""
+
+
+class _NoMorePaginationModel(BaseModel):
+    data: List[NoMorePaginationModelData]
+    """The list of results."""
+
+    has_more: Optional[bool] = None
+    """Whether there are more results to fetch."""
+
+
+CallListResponse: TypeAlias = Union[_HasMorePaginationModel, _NoMorePaginationModel]

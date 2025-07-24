@@ -25,6 +25,15 @@ class TestCalls:
 
     @pytest.mark.skip()
     @parametrize
+    def test_method_list_with_all_params(self, client: BeyondPresence) -> None:
+        call = client.calls.list(
+            cursor="cursor",
+            limit=1,
+        )
+        assert_matches_type(CallListResponse, call, path=["response"])
+
+    @pytest.mark.skip()
+    @parametrize
     def test_raw_response_list(self, client: BeyondPresence) -> None:
         response = client.calls.with_raw_response.list()
 
@@ -97,6 +106,15 @@ class TestAsyncCalls:
     @parametrize
     async def test_method_list(self, async_client: AsyncBeyondPresence) -> None:
         call = await async_client.calls.list()
+        assert_matches_type(CallListResponse, call, path=["response"])
+
+    @pytest.mark.skip()
+    @parametrize
+    async def test_method_list_with_all_params(self, async_client: AsyncBeyondPresence) -> None:
+        call = await async_client.calls.list(
+            cursor="cursor",
+            limit=1,
+        )
         assert_matches_type(CallListResponse, call, path=["response"])
 
     @pytest.mark.skip()
