@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from typing import Any, Optional, cast
+
 import httpx
 
+from ..types import avatar_list_params
 from .._types import NOT_GIVEN, Body, Query, Headers, NotGiven
+from .._utils import maybe_transform, async_maybe_transform
 from .._compat import cached_property
 from .._resource import SyncAPIResource, AsyncAPIResource
 from .._response import (
@@ -42,6 +46,8 @@ class AvatarResource(SyncAPIResource):
     def list(
         self,
         *,
+        cursor: Optional[str] | NotGiven = NOT_GIVEN,
+        limit: int | NotGiven = NOT_GIVEN,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -53,13 +59,41 @@ class AvatarResource(SyncAPIResource):
         List all avatars the owner of the API key has access to.
 
         See docs.bey.dev/avatar for more information on avatars.
+
+        Args:
+          cursor: Cursor for pagination
+
+          limit: The maximum number of avatars to return
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
         """
-        return self._get(
-            "/v1/avatar",
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+        return cast(
+            AvatarListResponse,
+            self._get(
+                "/v1/avatar",
+                options=make_request_options(
+                    extra_headers=extra_headers,
+                    extra_query=extra_query,
+                    extra_body=extra_body,
+                    timeout=timeout,
+                    query=maybe_transform(
+                        {
+                            "cursor": cursor,
+                            "limit": limit,
+                        },
+                        avatar_list_params.AvatarListParams,
+                    ),
+                ),
+                cast_to=cast(
+                    Any, AvatarListResponse
+                ),  # Union types cannot be passed in as arguments in the type system
             ),
-            cast_to=AvatarListResponse,
         )
 
 
@@ -86,6 +120,8 @@ class AsyncAvatarResource(AsyncAPIResource):
     async def list(
         self,
         *,
+        cursor: Optional[str] | NotGiven = NOT_GIVEN,
+        limit: int | NotGiven = NOT_GIVEN,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -97,13 +133,41 @@ class AsyncAvatarResource(AsyncAPIResource):
         List all avatars the owner of the API key has access to.
 
         See docs.bey.dev/avatar for more information on avatars.
+
+        Args:
+          cursor: Cursor for pagination
+
+          limit: The maximum number of avatars to return
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
         """
-        return await self._get(
-            "/v1/avatar",
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+        return cast(
+            AvatarListResponse,
+            await self._get(
+                "/v1/avatar",
+                options=make_request_options(
+                    extra_headers=extra_headers,
+                    extra_query=extra_query,
+                    extra_body=extra_body,
+                    timeout=timeout,
+                    query=await async_maybe_transform(
+                        {
+                            "cursor": cursor,
+                            "limit": limit,
+                        },
+                        avatar_list_params.AvatarListParams,
+                    ),
+                ),
+                cast_to=cast(
+                    Any, AvatarListResponse
+                ),  # Union types cannot be passed in as arguments in the type system
             ),
-            cast_to=AvatarListResponse,
         )
 
 

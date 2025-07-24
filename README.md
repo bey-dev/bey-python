@@ -32,7 +32,7 @@ client = BeyondPresence(
     api_key=os.environ.get("BEY_API_KEY"),  # This is the default and can be omitted
 )
 
-developer_agent_responses = client.agent.list()
+agents = client.agent.list()
 ```
 
 While you can provide an `api_key` keyword argument,
@@ -55,7 +55,7 @@ client = AsyncBeyondPresence(
 
 
 async def main() -> None:
-    developer_agent_responses = await client.agent.list()
+    agents = await client.agent.list()
 
 
 asyncio.run(main())
@@ -87,7 +87,7 @@ async def main() -> None:
         api_key="My API Key",
         http_client=DefaultAioHttpClient(),
     ) as client:
-        developer_agent_responses = await client.agent.list()
+        agents = await client.agent.list()
 
 
 asyncio.run(main())
