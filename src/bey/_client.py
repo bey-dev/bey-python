@@ -21,7 +21,7 @@ from ._types import (
 )
 from ._utils import is_given, get_async_library
 from ._version import __version__
-from .resources import auth, agent, calls, avatar
+from .resources import auth, agent, calls, avatar, session
 from ._streaming import Stream as Stream, AsyncStream as AsyncStream
 from ._exceptions import APIStatusError, BeyondPresenceError
 from ._base_client import (
@@ -47,6 +47,7 @@ class BeyondPresence(SyncAPIClient):
     auth: auth.AuthResource
     avatar: avatar.AvatarResource
     calls: calls.CallsResource
+    session: session.SessionResource
     with_raw_response: BeyondPresenceWithRawResponse
     with_streaming_response: BeyondPresenceWithStreamedResponse
 
@@ -108,6 +109,7 @@ class BeyondPresence(SyncAPIClient):
         self.auth = auth.AuthResource(self)
         self.avatar = avatar.AvatarResource(self)
         self.calls = calls.CallsResource(self)
+        self.session = session.SessionResource(self)
         self.with_raw_response = BeyondPresenceWithRawResponse(self)
         self.with_streaming_response = BeyondPresenceWithStreamedResponse(self)
 
@@ -221,6 +223,7 @@ class AsyncBeyondPresence(AsyncAPIClient):
     auth: auth.AsyncAuthResource
     avatar: avatar.AsyncAvatarResource
     calls: calls.AsyncCallsResource
+    session: session.AsyncSessionResource
     with_raw_response: AsyncBeyondPresenceWithRawResponse
     with_streaming_response: AsyncBeyondPresenceWithStreamedResponse
 
@@ -282,6 +285,7 @@ class AsyncBeyondPresence(AsyncAPIClient):
         self.auth = auth.AsyncAuthResource(self)
         self.avatar = avatar.AsyncAvatarResource(self)
         self.calls = calls.AsyncCallsResource(self)
+        self.session = session.AsyncSessionResource(self)
         self.with_raw_response = AsyncBeyondPresenceWithRawResponse(self)
         self.with_streaming_response = AsyncBeyondPresenceWithStreamedResponse(self)
 
@@ -396,6 +400,7 @@ class BeyondPresenceWithRawResponse:
         self.auth = auth.AuthResourceWithRawResponse(client.auth)
         self.avatar = avatar.AvatarResourceWithRawResponse(client.avatar)
         self.calls = calls.CallsResourceWithRawResponse(client.calls)
+        self.session = session.SessionResourceWithRawResponse(client.session)
 
 
 class AsyncBeyondPresenceWithRawResponse:
@@ -404,6 +409,7 @@ class AsyncBeyondPresenceWithRawResponse:
         self.auth = auth.AsyncAuthResourceWithRawResponse(client.auth)
         self.avatar = avatar.AsyncAvatarResourceWithRawResponse(client.avatar)
         self.calls = calls.AsyncCallsResourceWithRawResponse(client.calls)
+        self.session = session.AsyncSessionResourceWithRawResponse(client.session)
 
 
 class BeyondPresenceWithStreamedResponse:
@@ -412,6 +418,7 @@ class BeyondPresenceWithStreamedResponse:
         self.auth = auth.AuthResourceWithStreamingResponse(client.auth)
         self.avatar = avatar.AvatarResourceWithStreamingResponse(client.avatar)
         self.calls = calls.CallsResourceWithStreamingResponse(client.calls)
+        self.session = session.SessionResourceWithStreamingResponse(client.session)
 
 
 class AsyncBeyondPresenceWithStreamedResponse:
@@ -420,6 +427,7 @@ class AsyncBeyondPresenceWithStreamedResponse:
         self.auth = auth.AsyncAuthResourceWithStreamingResponse(client.auth)
         self.avatar = avatar.AsyncAvatarResourceWithStreamingResponse(client.avatar)
         self.calls = calls.AsyncCallsResourceWithStreamingResponse(client.calls)
+        self.session = session.AsyncSessionResourceWithStreamingResponse(client.session)
 
 
 Client = BeyondPresence

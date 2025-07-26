@@ -32,7 +32,12 @@ client = BeyondPresence(
     api_key=os.environ.get("BEY_API_KEY"),  # This is the default and can be omitted
 )
 
-agents = client.agent.list()
+session = client.session.create(
+    avatar_id="01234567-89ab-cdef-0123-456789abcdef",
+    livekit_token="<your-livekit-token>",
+    livekit_url="wss://<your-domain>.livekit.cloud",
+)
+print(session.id)
 ```
 
 While you can provide an `api_key` keyword argument,
@@ -55,7 +60,12 @@ client = AsyncBeyondPresence(
 
 
 async def main() -> None:
-    agents = await client.agent.list()
+    session = await client.session.create(
+        avatar_id="01234567-89ab-cdef-0123-456789abcdef",
+        livekit_token="<your-livekit-token>",
+        livekit_url="wss://<your-domain>.livekit.cloud",
+    )
+    print(session.id)
 
 
 asyncio.run(main())
@@ -87,7 +97,12 @@ async def main() -> None:
         api_key="My API Key",
         http_client=DefaultAioHttpClient(),
     ) as client:
-        agents = await client.agent.list()
+        session = await client.session.create(
+            avatar_id="01234567-89ab-cdef-0123-456789abcdef",
+            livekit_token="<your-livekit-token>",
+            livekit_url="wss://<your-domain>.livekit.cloud",
+        )
+        print(session.id)
 
 
 asyncio.run(main())
