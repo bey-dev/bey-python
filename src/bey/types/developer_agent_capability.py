@@ -4,4 +4,4 @@ from typing_extensions import Literal, TypeAlias
 
 __all__ = ["DeveloperAgentCapability"]
 
-DeveloperAgentCapability: TypeAlias = Literal["webcam_vision", "silent_mode"]
+DeveloperAgentCapability: TypeAlias = Literal["webcam_vision"]

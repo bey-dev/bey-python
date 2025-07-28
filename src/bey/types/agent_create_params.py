@@ -25,6 +25,7 @@ class AgentCreateParams(TypedDict, total=False):
 
     language: Optional[
         Literal[
+            "ar",
             "bg",
             "zh",
             "cs",
@@ -59,6 +60,7 @@ class AgentCreateParams(TypedDict, total=False):
             "sv",
             "tr",
             "uk",
+            "ur",
             "vi",
         ]
     ]

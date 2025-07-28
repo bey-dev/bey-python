@@ -27,6 +27,7 @@ class DeveloperAgentResponse(BaseModel):
 
     language: Optional[
         Literal[
+            "ar",
             "bg",
             "zh",
             "cs",
@@ -61,6 +62,7 @@ class DeveloperAgentResponse(BaseModel):
             "sv",
             "tr",
             "uk",
+            "ur",
             "vi",
         ]
     ] = None
