@@ -55,6 +55,7 @@ class AgentResource(SyncAPIResource):
         greeting: Optional[str] | NotGiven = NOT_GIVEN,
         language: Optional[
             Literal[
+                "ar",
                 "bg",
                 "zh",
                 "cs",
@@ -89,6 +90,7 @@ class AgentResource(SyncAPIResource):
                 "sv",
                 "tr",
                 "uk",
+                "ur",
                 "vi",
             ]
         ]
@@ -260,6 +262,7 @@ class AsyncAgentResource(AsyncAPIResource):
         greeting: Optional[str] | NotGiven = NOT_GIVEN,
         language: Optional[
             Literal[
+                "ar",
                 "bg",
                 "zh",
                 "cs",
@@ -294,6 +297,7 @@ class AsyncAgentResource(AsyncAPIResource):
                 "sv",
                 "tr",
                 "uk",
+                "ur",
                 "vi",
             ]
         ]
