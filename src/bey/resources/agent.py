@@ -163,7 +163,7 @@ class AgentResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
     ) -> AgentListResponse:
         """
-        List all agents the owner of the API key has access to.
+        List the available agents.
 
         Args:
           cursor: Cursor for pagination
@@ -370,7 +370,7 @@ class AsyncAgentResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
     ) -> AgentListResponse:
         """
-        List all agents the owner of the API key has access to.
+        List the available agents.
 
         Args:
           cursor: Cursor for pagination
