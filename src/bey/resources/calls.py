@@ -57,7 +57,7 @@ class CallsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
     ) -> CallListResponse:
         """
-        List all calls managed through agents by the owner of the API key.
+        List the calls managed by your agents.
 
         Args:
           cursor: Cursor for pagination
@@ -160,7 +160,7 @@ class AsyncCallsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
     ) -> CallListResponse:
         """
-        List all calls managed through agents by the owner of the API key.
+        List the calls managed by your agents.
 
         Args:
           cursor: Cursor for pagination

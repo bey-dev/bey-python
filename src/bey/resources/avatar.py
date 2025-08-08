@@ -56,7 +56,7 @@ class AvatarResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
     ) -> AvatarListResponse:
         """
-        List all avatars the owner of the API key has access to.
+        List the available avatars.
 
         See docs.bey.dev/avatar for more information on avatars.
 
@@ -130,7 +130,7 @@ class AsyncAvatarResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
     ) -> AvatarListResponse:
         """
-        List all avatars the owner of the API key has access to.
+        List the available avatars.
 
         See docs.bey.dev/avatar for more information on avatars.
 
