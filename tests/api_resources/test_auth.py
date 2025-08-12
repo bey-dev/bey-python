@@ -16,13 +16,13 @@ base_url = os.environ.get("TEST_API_BASE_URL", "http://127.0.0.1:4010")
 class TestAuth:
     parametrize = pytest.mark.parametrize("client", [False, True], indirect=True, ids=["loose", "strict"])
 
-    @pytest.mark.skip()
+    @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
     def test_method_verify(self, client: BeyondPresence) -> None:
         auth = client.auth.verify()
         assert_matches_type(object, auth, path=["response"])
 
-    @pytest.mark.skip()
+    @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
     def test_raw_response_verify(self, client: BeyondPresence) -> None:
         response = client.auth.with_raw_response.verify()
@@ -32,7 +32,7 @@ class TestAuth:
         auth = response.parse()
         assert_matches_type(object, auth, path=["response"])
 
-    @pytest.mark.skip()
+    @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
     def test_streaming_response_verify(self, client: BeyondPresence) -> None:
         with client.auth.with_streaming_response.verify() as response:
@@ -50,13 +50,13 @@ class TestAsyncAuth:
         "async_client", [False, True, {"http_client": "aiohttp"}], indirect=True, ids=["loose", "strict", "aiohttp"]
     )
 
-    @pytest.mark.skip()
+    @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
     async def test_method_verify(self, async_client: AsyncBeyondPresence) -> None:
         auth = await async_client.auth.verify()
         assert_matches_type(object, auth, path=["response"])
 
-    @pytest.mark.skip()
+    @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
     async def test_raw_response_verify(self, async_client: AsyncBeyondPresence) -> None:
         response = await async_client.auth.with_raw_response.verify()
@@ -66,7 +66,7 @@ class TestAsyncAuth:
         auth = await response.parse()
         assert_matches_type(object, auth, path=["response"])
 
-    @pytest.mark.skip()
+    @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
     async def test_streaming_response_verify(self, async_client: AsyncBeyondPresence) -> None:
         async with async_client.auth.with_streaming_response.verify() as response:
