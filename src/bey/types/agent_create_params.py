@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
-from typing_extensions import Literal, Required, TypedDict
+from typing import List, Union, Iterable, Optional
+from typing_extensions import Literal, Required, TypeAlias, TypedDict
 
-from .developer_agent_capability import DeveloperAgentCapability
-
-__all__ = ["AgentCreateParams"]
+__all__ = [
+    "AgentCreateParams",
+    "Capability",
+    "CapabilityWebcamVision",
+    "CapabilityWakeupMode",
+    "Llm",
+    "LlmOpenAI",
+    "LlmOpenAICompatible",
+]
 
 
 class AgentCreateParams(TypedDict, total=False):
@@ -17,7 +23,7 @@ class AgentCreateParams(TypedDict, total=False):
     system_prompt: Required[str]
     """The system prompt to use."""
 
-    capabilities: List[DeveloperAgentCapability]
+    capabilities: Iterable[Capability]
     """The extra capabilities to manage the call."""
 
     greeting: Optional[str]
@@ -66,8 +72,41 @@ class AgentCreateParams(TypedDict, total=False):
     ]
     """Enum for languages with language codes as values."""
 
+    llm: Optional[Llm]
+    """Configuration for the LLM to use."""
+
     max_session_length_minutes: Optional[int]
     """The maximum session length in minutes."""
 
     name: Optional[str]
     """The display name to use."""
+
+
+class CapabilityWebcamVision(TypedDict, total=False):
+    type: Literal["webcam_vision"]
+
+
+class CapabilityWakeupMode(TypedDict, total=False):
+    triggers: Required[List[str]]
+
+    type: Literal["wakeup_mode"]
+
+
+Capability: TypeAlias = Union[CapabilityWebcamVision, CapabilityWakeupMode]
+
+
+class LlmOpenAI(TypedDict, total=False):
+    type: Literal["openai"]
+
+
+class LlmOpenAICompatible(TypedDict, total=False):
+    api_id: Required[str]
+
+    model: Required[str]
+
+    temperature: Required[float]
+
+    type: Literal["openai_compatible"]
+
+
+Llm: TypeAlias = Union[LlmOpenAI, LlmOpenAICompatible]

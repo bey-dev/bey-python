@@ -9,7 +9,7 @@ __all__ = ["Session"]
 
 class Session(BaseModel):
     id: str
-    """Unique identifier of the object."""
+    """Unique identifier of the object in the database."""
 
     avatar_id: str
     """The ID of the avatar used in the session."""
