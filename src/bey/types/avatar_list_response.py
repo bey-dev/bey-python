@@ -16,7 +16,7 @@ __all__ = [
 
 class HasMorePaginationModelData(BaseModel):
     id: str
-    """Unique identifier of the object."""
+    """Unique identifier of the object in the database."""
 
 
 class _HasMorePaginationModel(BaseModel):
@@ -32,7 +32,7 @@ class _HasMorePaginationModel(BaseModel):
 
 class NoMorePaginationModelData(BaseModel):
     id: str
-    """Unique identifier of the object."""
+    """Unique identifier of the object in the database."""
 
 
 class _NoMorePaginationModel(BaseModel):

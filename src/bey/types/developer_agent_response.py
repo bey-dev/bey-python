@@ -1,17 +1,57 @@
 # File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-from typing import List, Optional
-from typing_extensions import Literal
+from typing import List, Union, Optional
+from typing_extensions import Literal, Annotated, TypeAlias
 
+from .._utils import PropertyInfo
 from .._models import BaseModel
-from .developer_agent_capability import DeveloperAgentCapability
 
-__all__ = ["DeveloperAgentResponse"]
+__all__ = [
+    "DeveloperAgentResponse",
+    "Capability",
+    "CapabilityWebcamVision",
+    "CapabilityWakeupMode",
+    "Llm",
+    "LlmOpenAI",
+    "LlmOpenAICompatible",
+]
+
+
+class CapabilityWebcamVision(BaseModel):
+    type: Optional[Literal["webcam_vision"]] = None
+
+
+class CapabilityWakeupMode(BaseModel):
+    triggers: List[str]
+
+    type: Optional[Literal["wakeup_mode"]] = None
+
+
+Capability: TypeAlias = Annotated[
+    Union[CapabilityWebcamVision, CapabilityWakeupMode], PropertyInfo(discriminator="type")
+]
+
+
+class LlmOpenAI(BaseModel):
+    type: Optional[Literal["openai"]] = None
+
+
+class LlmOpenAICompatible(BaseModel):
+    api_id: str
+
+    model: str
+
+    temperature: float
+
+    type: Optional[Literal["openai_compatible"]] = None
+
+
+Llm: TypeAlias = Annotated[Union[LlmOpenAI, LlmOpenAICompatible, None], PropertyInfo(discriminator="type")]
 
 
 class DeveloperAgentResponse(BaseModel):
     id: str
-    """Unique identifier of the object."""
+    """Unique identifier of the object in the database."""
 
     avatar_id: str
     """The ID of the avatar to use."""
@@ -19,7 +59,7 @@ class DeveloperAgentResponse(BaseModel):
     system_prompt: str
     """The system prompt to use."""
 
-    capabilities: Optional[List[DeveloperAgentCapability]] = None
+    capabilities: Optional[List[Capability]] = None
     """The extra capabilities to manage the call."""
 
     greeting: Optional[str] = None
@@ -67,6 +107,9 @@ class DeveloperAgentResponse(BaseModel):
         ]
     ] = None
     """Enum for languages with language codes as values."""
+
+    llm: Optional[Llm] = None
+    """Configuration for the LLM to use."""
 
     max_session_length_minutes: Optional[int] = None
     """The maximum session length in minutes."""

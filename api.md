@@ -3,7 +3,7 @@
 Types:
 
 ```python
-from bey.types import DeveloperAgentCapability, DeveloperAgentResponse, AgentListResponse
+from bey.types import DeveloperAgentResponse, AgentListResponse
 ```
 
 Methods:

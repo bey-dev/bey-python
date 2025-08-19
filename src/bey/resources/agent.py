@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, List, Optional, cast
+from typing import Any, Iterable, Optional, cast
 from typing_extensions import Literal
 
 import httpx
@@ -21,7 +21,6 @@ from .._response import (
 from .._base_client import make_request_options
 from ..types.agent_list_response import AgentListResponse
 from ..types.developer_agent_response import DeveloperAgentResponse
-from ..types.developer_agent_capability import DeveloperAgentCapability
 
 __all__ = ["AgentResource", "AsyncAgentResource"]
 
@@ -51,7 +50,7 @@ class AgentResource(SyncAPIResource):
         *,
         avatar_id: str,
         system_prompt: str,
-        capabilities: List[DeveloperAgentCapability] | NotGiven = NOT_GIVEN,
+        capabilities: Iterable[agent_create_params.Capability] | NotGiven = NOT_GIVEN,
         greeting: Optional[str] | NotGiven = NOT_GIVEN,
         language: Optional[
             Literal[
@@ -95,6 +94,7 @@ class AgentResource(SyncAPIResource):
             ]
         ]
         | NotGiven = NOT_GIVEN,
+        llm: Optional[agent_create_params.Llm] | NotGiven = NOT_GIVEN,
         max_session_length_minutes: Optional[int] | NotGiven = NOT_GIVEN,
         name: Optional[str] | NotGiven = NOT_GIVEN,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -118,6 +118,8 @@ class AgentResource(SyncAPIResource):
 
           language: Enum for languages with language codes as values.
 
+          llm: Configuration for the LLM to use.
+
           max_session_length_minutes: The maximum session length in minutes.
 
           name: The display name to use.
@@ -139,6 +141,7 @@ class AgentResource(SyncAPIResource):
                     "capabilities": capabilities,
                     "greeting": greeting,
                     "language": language,
+                    "llm": llm,
                     "max_session_length_minutes": max_session_length_minutes,
                     "name": name,
                 },
@@ -258,7 +261,7 @@ class AsyncAgentResource(AsyncAPIResource):
         *,
         avatar_id: str,
         system_prompt: str,
-        capabilities: List[DeveloperAgentCapability] | NotGiven = NOT_GIVEN,
+        capabilities: Iterable[agent_create_params.Capability] | NotGiven = NOT_GIVEN,
         greeting: Optional[str] | NotGiven = NOT_GIVEN,
         language: Optional[
             Literal[
@@ -302,6 +305,7 @@ class AsyncAgentResource(AsyncAPIResource):
             ]
         ]
         | NotGiven = NOT_GIVEN,
+        llm: Optional[agent_create_params.Llm] | NotGiven = NOT_GIVEN,
         max_session_length_minutes: Optional[int] | NotGiven = NOT_GIVEN,
         name: Optional[str] | NotGiven = NOT_GIVEN,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -325,6 +329,8 @@ class AsyncAgentResource(AsyncAPIResource):
 
           language: Enum for languages with language codes as values.
 
+          llm: Configuration for the LLM to use.
+
           max_session_length_minutes: The maximum session length in minutes.
 
           name: The display name to use.
@@ -346,6 +352,7 @@ class AsyncAgentResource(AsyncAPIResource):
                     "capabilities": capabilities,
                     "greeting": greeting,
                     "language": language,
+                    "llm": llm,
                     "max_session_length_minutes": max_session_length_minutes,
                     "name": name,
                 },

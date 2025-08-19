@@ -32,9 +32,16 @@ class TestAgent:
         agent = client.agent.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             system_prompt="You are a helpful assistant.",
-            capabilities=["webcam_vision"],
+            capabilities=[
+                {"type": "webcam_vision"},
+                {
+                    "triggers": ["hey agent", "hi pal"],
+                    "type": "wakeup_mode",
+                },
+            ],
             greeting="Hello!",
             language="en",
+            llm={"type": "openai"},
             max_session_length_minutes=30,
             name="John Doe",
         )
@@ -168,9 +175,16 @@ class TestAsyncAgent:
         agent = await async_client.agent.create(
             avatar_id="01234567-89ab-cdef-0123-456789abcdef",
             system_prompt="You are a helpful assistant.",
-            capabilities=["webcam_vision"],
+            capabilities=[
+                {"type": "webcam_vision"},
+                {
+                    "triggers": ["hey agent", "hi pal"],
+                    "type": "wakeup_mode",
+                },
+            ],
             greeting="Hello!",
             language="en",
+            llm={"type": "openai"},
             max_session_length_minutes=30,
             name="John Doe",
         )
