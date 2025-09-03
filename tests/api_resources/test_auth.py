@@ -8,7 +8,6 @@ from typing import Any, cast
 import pytest
 
 from bey import BeyondPresence, AsyncBeyondPresence
-from tests.utils import assert_matches_type
 
 base_url = os.environ.get("TEST_API_BASE_URL", "http://127.0.0.1:4010")
 
@@ -20,7 +19,7 @@ class TestAuth:
     @parametrize
     def test_method_verify(self, client: BeyondPresence) -> None:
         auth = client.auth.verify()
-        assert_matches_type(object, auth, path=["response"])
+        assert auth is None
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
@@ -30,7 +29,7 @@ class TestAuth:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         auth = response.parse()
-        assert_matches_type(object, auth, path=["response"])
+        assert auth is None
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
@@ -40,7 +39,7 @@ class TestAuth:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             auth = response.parse()
-            assert_matches_type(object, auth, path=["response"])
+            assert auth is None
 
         assert cast(Any, response.is_closed) is True
 
@@ -54,7 +53,7 @@ class TestAsyncAuth:
     @parametrize
     async def test_method_verify(self, async_client: AsyncBeyondPresence) -> None:
         auth = await async_client.auth.verify()
-        assert_matches_type(object, auth, path=["response"])
+        assert auth is None
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
@@ -64,7 +63,7 @@ class TestAsyncAuth:
         assert response.is_closed is True
         assert response.http_request.headers.get("X-Stainless-Lang") == "python"
         auth = await response.parse()
-        assert_matches_type(object, auth, path=["response"])
+        assert auth is None
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
@@ -74,6 +73,6 @@ class TestAsyncAuth:
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
 
             auth = await response.parse()
-            assert_matches_type(object, auth, path=["response"])
+            assert auth is None
 
         assert cast(Any, response.is_closed) is True

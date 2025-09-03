@@ -10,7 +10,7 @@ __all__ = ["CallListParams"]
 
 class CallListParams(TypedDict, total=False):
     cursor: Optional[str]
-    """Cursor for pagination"""
+    """Cursor for pagination."""
 
     limit: int
-    """The maximum number of calls to return"""
+    """Maximum number of objects to return."""

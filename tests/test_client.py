@@ -724,20 +724,20 @@ class TestBeyondPresence:
     @mock.patch("bey._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     def test_retrying_timeout_errors_doesnt_leak(self, respx_mock: MockRouter, client: BeyondPresence) -> None:
-        respx_mock.get("/v1/agent").mock(side_effect=httpx.TimeoutException("Test timeout error"))
+        respx_mock.get("/v1/auth/verify").mock(side_effect=httpx.TimeoutException("Test timeout error"))
 
         with pytest.raises(APITimeoutError):
-            client.agent.with_streaming_response.list().__enter__()
+            client.auth.with_streaming_response.verify().__enter__()
 
         assert _get_open_connections(self.client) == 0
 
     @mock.patch("bey._base_client.BaseClient._calculate_retry_timeout", _low_retry_timeout)
     @pytest.mark.respx(base_url=base_url)
     def test_retrying_status_errors_doesnt_leak(self, respx_mock: MockRouter, client: BeyondPresence) -> None:
-        respx_mock.get("/v1/agent").mock(return_value=httpx.Response(500))
+        respx_mock.get("/v1/auth/verify").mock(return_value=httpx.Response(500))
 
         with pytest.raises(APIStatusError):
-            client.agent.with_streaming_response.list().__enter__()
+            client.auth.with_streaming_response.verify().__enter__()
         assert _get_open_connections(self.client) == 0
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
@@ -764,9 +764,9 @@ class TestBeyondPresence:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/v1/agent").mock(side_effect=retry_handler)
+        respx_mock.get("/v1/auth/verify").mock(side_effect=retry_handler)
 
-        response = client.agent.with_raw_response.list()
+        response = client.auth.with_raw_response.verify()
 
         assert response.retries_taken == failures_before_success
         assert int(response.http_request.headers.get("x-stainless-retry-count")) == failures_before_success
@@ -788,9 +788,9 @@ class TestBeyondPresence:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/v1/agent").mock(side_effect=retry_handler)
+        respx_mock.get("/v1/auth/verify").mock(side_effect=retry_handler)
 
-        response = client.agent.with_raw_response.list(extra_headers={"x-stainless-retry-count": Omit()})
+        response = client.auth.with_raw_response.verify(extra_headers={"x-stainless-retry-count": Omit()})
 
         assert len(response.http_request.headers.get_list("x-stainless-retry-count")) == 0
 
@@ -811,9 +811,9 @@ class TestBeyondPresence:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/v1/agent").mock(side_effect=retry_handler)
+        respx_mock.get("/v1/auth/verify").mock(side_effect=retry_handler)
 
-        response = client.agent.with_raw_response.list(extra_headers={"x-stainless-retry-count": "42"})
+        response = client.auth.with_raw_response.verify(extra_headers={"x-stainless-retry-count": "42"})
 
         assert response.http_request.headers.get("x-stainless-retry-count") == "42"
 
@@ -1541,10 +1541,10 @@ class TestAsyncBeyondPresence:
     async def test_retrying_timeout_errors_doesnt_leak(
         self, respx_mock: MockRouter, async_client: AsyncBeyondPresence
     ) -> None:
-        respx_mock.get("/v1/agent").mock(side_effect=httpx.TimeoutException("Test timeout error"))
+        respx_mock.get("/v1/auth/verify").mock(side_effect=httpx.TimeoutException("Test timeout error"))
 
         with pytest.raises(APITimeoutError):
-            await async_client.agent.with_streaming_response.list().__aenter__()
+            await async_client.auth.with_streaming_response.verify().__aenter__()
 
         assert _get_open_connections(self.client) == 0
 
@@ -1553,10 +1553,10 @@ class TestAsyncBeyondPresence:
     async def test_retrying_status_errors_doesnt_leak(
         self, respx_mock: MockRouter, async_client: AsyncBeyondPresence
     ) -> None:
-        respx_mock.get("/v1/agent").mock(return_value=httpx.Response(500))
+        respx_mock.get("/v1/auth/verify").mock(return_value=httpx.Response(500))
 
         with pytest.raises(APIStatusError):
-            await async_client.agent.with_streaming_response.list().__aenter__()
+            await async_client.auth.with_streaming_response.verify().__aenter__()
         assert _get_open_connections(self.client) == 0
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
@@ -1584,9 +1584,9 @@ class TestAsyncBeyondPresence:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/v1/agent").mock(side_effect=retry_handler)
+        respx_mock.get("/v1/auth/verify").mock(side_effect=retry_handler)
 
-        response = await client.agent.with_raw_response.list()
+        response = await client.auth.with_raw_response.verify()
 
         assert response.retries_taken == failures_before_success
         assert int(response.http_request.headers.get("x-stainless-retry-count")) == failures_before_success
@@ -1609,9 +1609,9 @@ class TestAsyncBeyondPresence:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/v1/agent").mock(side_effect=retry_handler)
+        respx_mock.get("/v1/auth/verify").mock(side_effect=retry_handler)
 
-        response = await client.agent.with_raw_response.list(extra_headers={"x-stainless-retry-count": Omit()})
+        response = await client.auth.with_raw_response.verify(extra_headers={"x-stainless-retry-count": Omit()})
 
         assert len(response.http_request.headers.get_list("x-stainless-retry-count")) == 0
 
@@ -1633,9 +1633,9 @@ class TestAsyncBeyondPresence:
                 return httpx.Response(500)
             return httpx.Response(200)
 
-        respx_mock.get("/v1/agent").mock(side_effect=retry_handler)
+        respx_mock.get("/v1/auth/verify").mock(side_effect=retry_handler)
 
-        response = await client.agent.with_raw_response.list(extra_headers={"x-stainless-retry-count": "42"})
+        response = await client.auth.with_raw_response.verify(extra_headers={"x-stainless-retry-count": "42"})
 
         assert response.http_request.headers.get("x-stainless-retry-count") == "42"
 

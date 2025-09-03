@@ -32,12 +32,7 @@ client = BeyondPresence(
     api_key=os.environ.get("BEY_API_KEY"),  # This is the default and can be omitted
 )
 
-session = client.session.create(
-    avatar_id="01234567-89ab-cdef-0123-456789abcdef",
-    livekit_token="<your-livekit-token>",
-    livekit_url="wss://<your-domain>.livekit.cloud",
-)
-print(session.id)
+client.auth.verify()
 ```
 
 While you can provide an `api_key` keyword argument,
@@ -60,12 +55,7 @@ client = AsyncBeyondPresence(
 
 
 async def main() -> None:
-    session = await client.session.create(
-        avatar_id="01234567-89ab-cdef-0123-456789abcdef",
-        livekit_token="<your-livekit-token>",
-        livekit_url="wss://<your-domain>.livekit.cloud",
-    )
-    print(session.id)
+    await client.auth.verify()
 
 
 asyncio.run(main())
@@ -97,12 +87,7 @@ async def main() -> None:
         api_key="My API Key",
         http_client=DefaultAioHttpClient(),
     ) as client:
-        session = await client.session.create(
-            avatar_id="01234567-89ab-cdef-0123-456789abcdef",
-            livekit_token="<your-livekit-token>",
-            livekit_url="wss://<your-domain>.livekit.cloud",
-        )
-        print(session.id)
+        await client.auth.verify()
 
 
 asyncio.run(main())
@@ -133,7 +118,7 @@ from bey import BeyondPresence
 client = BeyondPresence()
 
 try:
-    client.agent.list()
+    client.auth.verify()
 except bey.APIConnectionError as e:
     print("The server could not be reached")
     print(e.__cause__)  # an underlying Exception, likely raised within httpx.
@@ -176,7 +161,7 @@ client = BeyondPresence(
 )
 
 # Or, configure per-request:
-client.with_options(max_retries=5).agent.list()
+client.with_options(max_retries=5).auth.verify()
 ```
 
 ### Timeouts
@@ -199,7 +184,7 @@ client = BeyondPresence(
 )
 
 # Override per-request:
-client.with_options(timeout=5.0).agent.list()
+client.with_options(timeout=5.0).auth.verify()
 ```
 
 On timeout, an `APITimeoutError` is thrown.
@@ -240,11 +225,11 @@ The "raw" Response object can be accessed by prefixing `.with_raw_response.` to 
 from bey import BeyondPresence
 
 client = BeyondPresence()
-response = client.agent.with_raw_response.list()
+response = client.auth.with_raw_response.verify()
 print(response.headers.get('X-My-Header'))
 
-agent = response.parse()  # get the object that `agent.list()` would have returned
-print(agent)
+auth = response.parse()  # get the object that `auth.verify()` would have returned
+print(auth)
 ```
 
 These methods return an [`APIResponse`](https://github.com/bey-dev/bey-python/tree/main/src/bey/_response.py) object.
@@ -258,7 +243,7 @@ The above interface eagerly reads the full response body when you make the reque
 To stream the response body, use `.with_streaming_response` instead, which requires a context manager and only reads the response body once you call `.read()`, `.text()`, `.json()`, `.iter_bytes()`, `.iter_text()`, `.iter_lines()` or `.parse()`. In the async client, these are async methods.
 
 ```python
-with client.agent.with_streaming_response.list() as response:
+with client.auth.with_streaming_response.verify() as response:
     print(response.headers.get("X-My-Header"))
 
     for line in response.iter_lines():
