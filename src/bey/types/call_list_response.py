@@ -7,40 +7,58 @@ from .._models import BaseModel
 
 __all__ = [
     "CallListResponse",
-    "_HasMorePaginationModel",
-    "HasMorePaginationModelData",
-    "_NoMorePaginationModel",
-    "NoMorePaginationModelData",
+    "HasMorePageCallResponse",
+    "HasMorePageCallResponseData",
+    "NoMorePageCallResponse",
+    "NoMorePageCallResponseData",
 ]
 
 
-class HasMorePaginationModelData(BaseModel):
+class HasMorePageCallResponseData(BaseModel):
     id: str
     """Unique identifier of the object in the database."""
 
+    agent_id: str
+    """ID of managing agent."""
 
-class _HasMorePaginationModel(BaseModel):
-    data: List[HasMorePaginationModelData]
-    """The list of results."""
+    ended_at: Optional[str] = None
+    """End time in ISO 8601 format. If null, call might still be ongoing."""
+
+    started_at: str
+    """Start time in ISO 8601 format."""
+
+
+class HasMorePageCallResponse(BaseModel):
+    data: List[HasMorePageCallResponseData]
+    """List of objects."""
 
     next_cursor: str
-    """The cursor for the next page of results."""
+    """The cursor for the next page of objects."""
 
     has_more: Optional[Literal[True]] = None
-    """Whether there are more results to fetch."""
+    """Whether there are more objects to fetch."""
 
 
-class NoMorePaginationModelData(BaseModel):
+class NoMorePageCallResponseData(BaseModel):
     id: str
     """Unique identifier of the object in the database."""
 
+    agent_id: str
+    """ID of managing agent."""
 
-class _NoMorePaginationModel(BaseModel):
-    data: List[NoMorePaginationModelData]
-    """The list of results."""
+    ended_at: Optional[str] = None
+    """End time in ISO 8601 format. If null, call might still be ongoing."""
+
+    started_at: str
+    """Start time in ISO 8601 format."""
+
+
+class NoMorePageCallResponse(BaseModel):
+    data: List[NoMorePageCallResponseData]
+    """List of objects."""
 
     has_more: Optional[bool] = None
-    """Whether there are more results to fetch."""
+    """Whether there are more objects to fetch."""
 
 
-CallListResponse: TypeAlias = Union[_HasMorePaginationModel, _NoMorePaginationModel]
+CallListResponse: TypeAlias = Union[HasMorePageCallResponse, NoMorePageCallResponse]
