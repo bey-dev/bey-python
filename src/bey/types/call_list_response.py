@@ -1,6 +1,6 @@
 # File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-from typing import Dict, List, Union, Optional
+from typing import List, Union, Optional
 from typing_extensions import Literal, TypeAlias
 
 from .._models import BaseModel
@@ -19,16 +19,13 @@ class HasMorePageCallResponseData(BaseModel):
     """Unique identifier of the object in the database."""
 
     agent_id: str
-    """ID of agent managing the call."""
+    """ID of managing agent."""
 
     ended_at: Optional[str] = None
     """End time in ISO 8601 format. If null, call might still be ongoing."""
 
     started_at: str
     """Start time in ISO 8601 format."""
-
-    tags: Optional[Dict[str, str]] = None
-    """Tags for the call"""
 
 
 class HasMorePageCallResponse(BaseModel):
@@ -47,16 +44,13 @@ class NoMorePageCallResponseData(BaseModel):
     """Unique identifier of the object in the database."""
 
     agent_id: str
-    """ID of agent managing the call."""
+    """ID of managing agent."""
 
     ended_at: Optional[str] = None
     """End time in ISO 8601 format. If null, call might still be ongoing."""
 
     started_at: str
     """Start time in ISO 8601 format."""
-
-    tags: Optional[Dict[str, str]] = None
-    """Tags for the call"""
 
 
 class NoMorePageCallResponse(BaseModel):
