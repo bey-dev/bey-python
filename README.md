@@ -77,6 +77,7 @@ pip install bey[aiohttp]
 Then you can enable it by instantiating the client with `http_client=DefaultAioHttpClient()`:
 
 ```python
+import os
 import asyncio
 from bey import DefaultAioHttpClient
 from bey import AsyncBeyondPresence
@@ -84,7 +85,7 @@ from bey import AsyncBeyondPresence
 
 async def main() -> None:
     async with AsyncBeyondPresence(
-        api_key="My API Key",
+        api_key=os.environ.get("BEY_API_KEY"),  # This is the default and can be omitted
         http_client=DefaultAioHttpClient(),
     ) as client:
         await client.auth.verify()
