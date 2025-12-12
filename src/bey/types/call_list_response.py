@@ -24,10 +24,14 @@ __all__ = [
 
 
 class HasMorePageCallResponseDataStatusToStartCallStatus(BaseModel):
+    """Status for call that has not yet started."""
+
     type: Optional[Literal["to_start"]] = None
 
 
 class HasMorePageCallResponseDataStatusOngoingCallStatus(BaseModel):
+    """Status for call that is currently ongoing."""
+
     started_at: str
     """Start time in ISO 8601 format."""
 
@@ -35,6 +39,8 @@ class HasMorePageCallResponseDataStatusOngoingCallStatus(BaseModel):
 
 
 class HasMorePageCallResponseDataStatusCompletedCallStatus(BaseModel):
+    """Status for call that has completed."""
+
     ended_at: str
     """End time in ISO 8601 format."""
 
@@ -55,6 +61,8 @@ HasMorePageCallResponseDataStatus: TypeAlias = Annotated[
 
 
 class HasMorePageCallResponseData(BaseModel):
+    """Response model for a call."""
+
     id: str
     """Unique identifier of the object in the database."""
 
@@ -80,10 +88,14 @@ class HasMorePageCallResponse(BaseModel):
 
 
 class NoMorePageCallResponseDataStatusToStartCallStatus(BaseModel):
+    """Status for call that has not yet started."""
+
     type: Optional[Literal["to_start"]] = None
 
 
 class NoMorePageCallResponseDataStatusOngoingCallStatus(BaseModel):
+    """Status for call that is currently ongoing."""
+
     started_at: str
     """Start time in ISO 8601 format."""
 
@@ -91,6 +103,8 @@ class NoMorePageCallResponseDataStatusOngoingCallStatus(BaseModel):
 
 
 class NoMorePageCallResponseDataStatusCompletedCallStatus(BaseModel):
+    """Status for call that has completed."""
+
     ended_at: str
     """End time in ISO 8601 format."""
 
@@ -111,6 +125,8 @@ NoMorePageCallResponseDataStatus: TypeAlias = Annotated[
 
 
 class NoMorePageCallResponseData(BaseModel):
+    """Response model for a call."""
+
     id: str
     """Unique identifier of the object in the database."""
 
