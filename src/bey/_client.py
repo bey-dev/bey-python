@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Mapping
+from typing import TYPE_CHECKING, Any, Mapping
 from typing_extensions import Self, override
 
 import httpx
@@ -20,8 +20,8 @@ from ._types import (
     not_given,
 )
 from ._utils import is_given, get_async_library
+from ._compat import cached_property
 from ._version import __version__
-from .resources import auth, calls
 from ._streaming import Stream as Stream, AsyncStream as AsyncStream
 from ._exceptions import APIStatusError, BeyondPresenceError
 from ._base_client import (
@@ -29,6 +29,11 @@ from ._base_client import (
     SyncAPIClient,
     AsyncAPIClient,
 )
+
+if TYPE_CHECKING:
+    from .resources import auth, calls
+    from .resources.auth import AuthResource, AsyncAuthResource
+    from .resources.calls import CallsResource, AsyncCallsResource
 
 __all__ = [
     "Timeout",
@@ -43,11 +48,6 @@ __all__ = [
 
 
 class BeyondPresence(SyncAPIClient):
-    auth: auth.AuthResource
-    calls: calls.CallsResource
-    with_raw_response: BeyondPresenceWithRawResponse
-    with_streaming_response: BeyondPresenceWithStreamedResponse
-
     # client options
     api_key: str
 
@@ -102,10 +102,25 @@ class BeyondPresence(SyncAPIClient):
             _strict_response_validation=_strict_response_validation,
         )
 
-        self.auth = auth.AuthResource(self)
-        self.calls = calls.CallsResource(self)
-        self.with_raw_response = BeyondPresenceWithRawResponse(self)
-        self.with_streaming_response = BeyondPresenceWithStreamedResponse(self)
+    @cached_property
+    def auth(self) -> AuthResource:
+        from .resources.auth import AuthResource
+
+        return AuthResource(self)
+
+    @cached_property
+    def calls(self) -> CallsResource:
+        from .resources.calls import CallsResource
+
+        return CallsResource(self)
+
+    @cached_property
+    def with_raw_response(self) -> BeyondPresenceWithRawResponse:
+        return BeyondPresenceWithRawResponse(self)
+
+    @cached_property
+    def with_streaming_response(self) -> BeyondPresenceWithStreamedResponse:
+        return BeyondPresenceWithStreamedResponse(self)
 
     @property
     @override
@@ -213,11 +228,6 @@ class BeyondPresence(SyncAPIClient):
 
 
 class AsyncBeyondPresence(AsyncAPIClient):
-    auth: auth.AsyncAuthResource
-    calls: calls.AsyncCallsResource
-    with_raw_response: AsyncBeyondPresenceWithRawResponse
-    with_streaming_response: AsyncBeyondPresenceWithStreamedResponse
-
     # client options
     api_key: str
 
@@ -272,10 +282,25 @@ class AsyncBeyondPresence(AsyncAPIClient):
             _strict_response_validation=_strict_response_validation,
         )
 
-        self.auth = auth.AsyncAuthResource(self)
-        self.calls = calls.AsyncCallsResource(self)
-        self.with_raw_response = AsyncBeyondPresenceWithRawResponse(self)
-        self.with_streaming_response = AsyncBeyondPresenceWithStreamedResponse(self)
+    @cached_property
+    def auth(self) -> AsyncAuthResource:
+        from .resources.auth import AsyncAuthResource
+
+        return AsyncAuthResource(self)
+
+    @cached_property
+    def calls(self) -> AsyncCallsResource:
+        from .resources.calls import AsyncCallsResource
+
+        return AsyncCallsResource(self)
+
+    @cached_property
+    def with_raw_response(self) -> AsyncBeyondPresenceWithRawResponse:
+        return AsyncBeyondPresenceWithRawResponse(self)
+
+    @cached_property
+    def with_streaming_response(self) -> AsyncBeyondPresenceWithStreamedResponse:
+        return AsyncBeyondPresenceWithStreamedResponse(self)
 
     @property
     @override
@@ -383,27 +408,79 @@ class AsyncBeyondPresence(AsyncAPIClient):
 
 
 class BeyondPresenceWithRawResponse:
+    _client: BeyondPresence
+
     def __init__(self, client: BeyondPresence) -> None:
-        self.auth = auth.AuthResourceWithRawResponse(client.auth)
-        self.calls = calls.CallsResourceWithRawResponse(client.calls)
+        self._client = client
+
+    @cached_property
+    def auth(self) -> auth.AuthResourceWithRawResponse:
+        from .resources.auth import AuthResourceWithRawResponse
+
+        return AuthResourceWithRawResponse(self._client.auth)
+
+    @cached_property
+    def calls(self) -> calls.CallsResourceWithRawResponse:
+        from .resources.calls import CallsResourceWithRawResponse
+
+        return CallsResourceWithRawResponse(self._client.calls)
 
 
 class AsyncBeyondPresenceWithRawResponse:
+    _client: AsyncBeyondPresence
+
     def __init__(self, client: AsyncBeyondPresence) -> None:
-        self.auth = auth.AsyncAuthResourceWithRawResponse(client.auth)
-        self.calls = calls.AsyncCallsResourceWithRawResponse(client.calls)
+        self._client = client
+
+    @cached_property
+    def auth(self) -> auth.AsyncAuthResourceWithRawResponse:
+        from .resources.auth import AsyncAuthResourceWithRawResponse
+
+        return AsyncAuthResourceWithRawResponse(self._client.auth)
+
+    @cached_property
+    def calls(self) -> calls.AsyncCallsResourceWithRawResponse:
+        from .resources.calls import AsyncCallsResourceWithRawResponse
+
+        return AsyncCallsResourceWithRawResponse(self._client.calls)
 
 
 class BeyondPresenceWithStreamedResponse:
+    _client: BeyondPresence
+
     def __init__(self, client: BeyondPresence) -> None:
-        self.auth = auth.AuthResourceWithStreamingResponse(client.auth)
-        self.calls = calls.CallsResourceWithStreamingResponse(client.calls)
+        self._client = client
+
+    @cached_property
+    def auth(self) -> auth.AuthResourceWithStreamingResponse:
+        from .resources.auth import AuthResourceWithStreamingResponse
+
+        return AuthResourceWithStreamingResponse(self._client.auth)
+
+    @cached_property
+    def calls(self) -> calls.CallsResourceWithStreamingResponse:
+        from .resources.calls import CallsResourceWithStreamingResponse
+
+        return CallsResourceWithStreamingResponse(self._client.calls)
 
 
 class AsyncBeyondPresenceWithStreamedResponse:
+    _client: AsyncBeyondPresence
+
     def __init__(self, client: AsyncBeyondPresence) -> None:
-        self.auth = auth.AsyncAuthResourceWithStreamingResponse(client.auth)
-        self.calls = calls.AsyncCallsResourceWithStreamingResponse(client.calls)
+        self._client = client
+
+    @cached_property
+    def auth(self) -> auth.AsyncAuthResourceWithStreamingResponse:
+        from .resources.auth import AsyncAuthResourceWithStreamingResponse
+
+        return AsyncAuthResourceWithStreamingResponse(self._client.auth)
+
+    @cached_property
+    def calls(self) -> calls.AsyncCallsResourceWithStreamingResponse:
+        from .resources.calls import AsyncCallsResourceWithStreamingResponse
+
+        return AsyncCallsResourceWithStreamingResponse(self._client.calls)
 
 
 Client = BeyondPresence
