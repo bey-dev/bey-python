@@ -144,7 +144,7 @@ class NoMorePageCallResponse(BaseModel):
     data: List[NoMorePageCallResponseData]
     """List of objects."""
 
-    has_more: Optional[bool] = None
+    has_more: Optional[Literal[False]] = None
     """Whether there are more objects to fetch."""
 
 
