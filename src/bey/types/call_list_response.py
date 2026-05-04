@@ -75,6 +75,12 @@ class HasMorePageCallResponseData(BaseModel):
     tags: Optional[Dict[str, str]] = None
     """Tags for the call"""
 
+    user_email: Optional[str] = None
+    """Email of the user."""
+
+    user_name: Optional[str] = None
+    """Name of the user."""
+
 
 class HasMorePageCallResponse(BaseModel):
     data: List[HasMorePageCallResponseData]
@@ -138,6 +144,12 @@ class NoMorePageCallResponseData(BaseModel):
 
     tags: Optional[Dict[str, str]] = None
     """Tags for the call"""
+
+    user_email: Optional[str] = None
+    """Email of the user."""
+
+    user_name: Optional[str] = None
+    """Name of the user."""
 
 
 class NoMorePageCallResponse(BaseModel):
