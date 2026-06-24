@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from typing import Any, Optional, cast
+
 import httpx
 
-from .._types import NOT_GIVEN, Body, Query, Headers, NotGiven
+from ..types import call_list_params
+from .._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
+from .._utils import maybe_transform, async_maybe_transform
 from .._compat import cached_property
 from .._resource import SyncAPIResource, AsyncAPIResource
 from .._response import (
@@ -15,7 +19,6 @@ from .._response import (
 )
 from .._base_client import make_request_options
 from ..types.call_list_response import CallListResponse
-from ..types.call_list_messages_response import CallListMessagesResponse
 
 __all__ = ["CallsResource", "AsyncCallsResource"]
 
@@ -43,37 +46,23 @@ class CallsResource(SyncAPIResource):
     def list(
         self,
         *,
+        cursor: Optional[str] | Omit = omit,
+        limit: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> CallListResponse:
-        """List all calls managed through agents by the owner of the API key."""
-        return self._get(
-            "/v1/calls",
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
-            ),
-            cast_to=CallListResponse,
-        )
-
-    def list_messages(
-        self,
-        call_id: str,
-        *,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
-    ) -> CallListMessagesResponse:
         """
-        List the messages of a call.
+        List calls managed by your agents.
 
         Args:
+          cursor: Cursor for pagination.
+
+          limit: Maximum number of objects to return.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -82,14 +71,25 @@ class CallsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if not call_id:
-            raise ValueError(f"Expected a non-empty value for `call_id` but received {call_id!r}")
-        return self._get(
-            f"/v1/calls/{call_id}/messages",
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+        return cast(
+            CallListResponse,
+            self._get(
+                "/v1/calls",
+                options=make_request_options(
+                    extra_headers=extra_headers,
+                    extra_query=extra_query,
+                    extra_body=extra_body,
+                    timeout=timeout,
+                    query=maybe_transform(
+                        {
+                            "cursor": cursor,
+                            "limit": limit,
+                        },
+                        call_list_params.CallListParams,
+                    ),
+                ),
+                cast_to=cast(Any, CallListResponse),  # Union types cannot be passed in as arguments in the type system
             ),
-            cast_to=CallListMessagesResponse,
         )
 
 
@@ -116,37 +116,23 @@ class AsyncCallsResource(AsyncAPIResource):
     async def list(
         self,
         *,
+        cursor: Optional[str] | Omit = omit,
+        limit: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> CallListResponse:
-        """List all calls managed through agents by the owner of the API key."""
-        return await self._get(
-            "/v1/calls",
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
-            ),
-            cast_to=CallListResponse,
-        )
-
-    async def list_messages(
-        self,
-        call_id: str,
-        *,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = NOT_GIVEN,
-    ) -> CallListMessagesResponse:
         """
-        List the messages of a call.
+        List calls managed by your agents.
 
         Args:
+          cursor: Cursor for pagination.
+
+          limit: Maximum number of objects to return.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -155,14 +141,25 @@ class AsyncCallsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if not call_id:
-            raise ValueError(f"Expected a non-empty value for `call_id` but received {call_id!r}")
-        return await self._get(
-            f"/v1/calls/{call_id}/messages",
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+        return cast(
+            CallListResponse,
+            await self._get(
+                "/v1/calls",
+                options=make_request_options(
+                    extra_headers=extra_headers,
+                    extra_query=extra_query,
+                    extra_body=extra_body,
+                    timeout=timeout,
+                    query=await async_maybe_transform(
+                        {
+                            "cursor": cursor,
+                            "limit": limit,
+                        },
+                        call_list_params.CallListParams,
+                    ),
+                ),
+                cast_to=cast(Any, CallListResponse),  # Union types cannot be passed in as arguments in the type system
             ),
-            cast_to=CallListMessagesResponse,
         )
 
 
@@ -173,9 +170,6 @@ class CallsResourceWithRawResponse:
         self.list = to_raw_response_wrapper(
             calls.list,
         )
-        self.list_messages = to_raw_response_wrapper(
-            calls.list_messages,
-        )
 
 
 class AsyncCallsResourceWithRawResponse:
@@ -184,9 +178,6 @@ class AsyncCallsResourceWithRawResponse:
 
         self.list = async_to_raw_response_wrapper(
             calls.list,
-        )
-        self.list_messages = async_to_raw_response_wrapper(
-            calls.list_messages,
         )
 
 
@@ -197,9 +188,6 @@ class CallsResourceWithStreamingResponse:
         self.list = to_streamed_response_wrapper(
             calls.list,
         )
-        self.list_messages = to_streamed_response_wrapper(
-            calls.list_messages,
-        )
 
 
 class AsyncCallsResourceWithStreamingResponse:
@@ -208,7 +196,4 @@ class AsyncCallsResourceWithStreamingResponse:
 
         self.list = async_to_streamed_response_wrapper(
             calls.list,
-        )
-        self.list_messages = async_to_streamed_response_wrapper(
-            calls.list_messages,
         )

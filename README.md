@@ -1,12 +1,22 @@
 # Beyond Presence Python API library
 
-[![PyPI version](<https://img.shields.io/pypi/v/bey.svg?label=pypi%20(stable)>)](https://pypi.org/project/bey/)
+<!-- prettier-ignore -->
+[![PyPI version](https://img.shields.io/pypi/v/bey.svg?label=pypi%20(stable))](https://pypi.org/project/bey/)
 
-The Beyond Presence Python library provides convenient access to the Beyond Presence REST API from any Python 3.8+
+The Beyond Presence Python library provides convenient access to the Beyond Presence REST API from any Python 3.9+
 application. The library includes type definitions for all request params and response fields,
 and offers both synchronous and asynchronous clients powered by [httpx](https://github.com/encode/httpx).
 
 It is generated with [Stainless](https://www.stainless.com/).
+
+## MCP Server
+
+Use the Beyond Presence MCP Server to enable AI assistants to interact with this API, allowing them to explore endpoints, make test requests, and use documentation to help integrate this SDK into your application.
+
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=bey-mcp&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImJleS1tY3AiXSwiZW52Ijp7IkJFWV9BUElfS0VZIjoiTXkgQVBJIEtleSJ9fQ)
+[![Install in VS Code](https://img.shields.io/badge/_-Add_to_VS_Code-blue?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHZpZXdCb3g9IjAgMCA0MCA0MCI+PHBhdGggZmlsbD0iI0VFRSIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNMzAuMjM1IDM5Ljg4NGEyLjQ5MSAyLjQ5MSAwIDAgMS0xLjc4MS0uNzNMMTIuNyAyNC43OGwtMy40NiAyLjYyNC0zLjQwNiAyLjU4MmExLjY2NSAxLjY2NSAwIDAgMS0xLjA4Mi4zMzggMS42NjQgMS42NjQgMCAwIDEtMS4wNDYtLjQzMWwtMi4yLTJhMS42NjYgMS42NjYgMCAwIDEgMC0yLjQ2M0w3LjQ1OCAyMCA0LjY3IDE3LjQ1MyAxLjUwNyAxNC41N2ExLjY2NSAxLjY2NSAwIDAgMSAwLTIuNDYzbDIuMi0yYTEuNjY1IDEuNjY1IDAgMCAxIDIuMTMtLjA5N2w2Ljg2MyA1LjIwOUwyOC40NTIuODQ0YTIuNDg4IDIuNDg4IDAgMCAxIDEuODQxLS43MjljLjM1MS4wMDkuNjk5LjA5MSAxLjAxOS4yNDVsOC4yMzYgMy45NjFhMi41IDIuNSAwIDAgMSAxLjQxNSAyLjI1M3YuMDk5LS4wNDVWMzMuMzd2LS4wNDUuMDk1YTIuNTAxIDIuNTAxIDAgMCAxLTEuNDE2IDIuMjU3bC04LjIzNSAzLjk2MWEyLjQ5MiAyLjQ5MiAwIDAgMS0xLjA3Ny4yNDZabS43MTYtMjguOTQ3LTExLjk0OCA5LjA2MiAxMS45NTIgOS4wNjUtLjAwNC0xOC4xMjdaIi8+PC9zdmc+)](https://vscode.stainless.com/mcp/%7B%22name%22%3A%22bey-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22bey-mcp%22%5D%2C%22env%22%3A%7B%22BEY_API_KEY%22%3A%22My%20API%20Key%22%7D%7D)
+
+> Note: You may need to set environment variables in your MCP client.
 
 ## Documentation
 
@@ -31,12 +41,7 @@ client = BeyondPresence(
     api_key=os.environ.get("BEY_API_KEY"),  # This is the default and can be omitted
 )
 
-session = client.session.create(
-    avatar_id="01234567-89ab-cdef-0123-456789abcdef",
-    livekit_token="<your-livekit-token>",
-    livekit_url="wss://<your-domain>.livekit.cloud",
-)
-print(session.id)
+client.auth.verify()
 ```
 
 While you can provide an `api_key` keyword argument,
@@ -59,12 +64,7 @@ client = AsyncBeyondPresence(
 
 
 async def main() -> None:
-    session = await client.session.create(
-        avatar_id="01234567-89ab-cdef-0123-456789abcdef",
-        livekit_token="<your-livekit-token>",
-        livekit_url="wss://<your-domain>.livekit.cloud",
-    )
-    print(session.id)
+    await client.auth.verify()
 
 
 asyncio.run(main())
@@ -97,12 +97,7 @@ async def main() -> None:
         api_key=os.environ.get("BEY_API_KEY"),  # This is the default and can be omitted
         http_client=DefaultAioHttpClient(),
     ) as client:
-        session = await client.session.create(
-            avatar_id="01234567-89ab-cdef-0123-456789abcdef",
-            livekit_token="<your-livekit-token>",
-            livekit_url="wss://<your-domain>.livekit.cloud",
-        )
-        print(session.id)
+        await client.auth.verify()
 
 
 asyncio.run(main())
@@ -133,7 +128,7 @@ from bey import BeyondPresence
 client = BeyondPresence()
 
 try:
-    client.agent.list()
+    client.auth.verify()
 except bey.APIConnectionError as e:
     print("The server could not be reached")
     print(e.__cause__)  # an underlying Exception, likely raised within httpx.
@@ -176,7 +171,7 @@ client = BeyondPresence(
 )
 
 # Or, configure per-request:
-client.with_options(max_retries=5).agent.list()
+client.with_options(max_retries=5).auth.verify()
 ```
 
 ### Timeouts
@@ -199,7 +194,7 @@ client = BeyondPresence(
 )
 
 # Override per-request:
-client.with_options(timeout=5.0).agent.list()
+client.with_options(timeout=5.0).auth.verify()
 ```
 
 On timeout, an `APITimeoutError` is thrown.
@@ -240,11 +235,11 @@ The "raw" Response object can be accessed by prefixing `.with_raw_response.` to 
 from bey import BeyondPresence
 
 client = BeyondPresence()
-response = client.agent.with_raw_response.list()
+response = client.auth.with_raw_response.verify()
 print(response.headers.get('X-My-Header'))
 
-agent = response.parse()  # get the object that `agent.list()` would have returned
-print(agent)
+auth = response.parse()  # get the object that `auth.verify()` would have returned
+print(auth)
 ```
 
 These methods return an [`APIResponse`](https://github.com/bey-dev/bey-python/tree/main/src/bey/_response.py) object.
@@ -258,7 +253,7 @@ The above interface eagerly reads the full response body when you make the reque
 To stream the response body, use `.with_streaming_response` instead, which requires a context manager and only reads the response body once you call `.read()`, `.text()`, `.json()`, `.iter_bytes()`, `.iter_text()`, `.iter_lines()` or `.parse()`. In the async client, these are async methods.
 
 ```python
-with client.agent.with_streaming_response.list() as response:
+with client.auth.with_streaming_response.verify() as response:
     print(response.headers.get("X-My-Header"))
 
     for line in response.iter_lines():
@@ -368,7 +363,7 @@ print(bey.__version__)
 
 ## Requirements
 
-Python 3.8 or higher.
+Python 3.9 or higher.
 
 ## Contributing
 
