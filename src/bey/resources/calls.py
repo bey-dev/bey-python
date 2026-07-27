@@ -58,6 +58,9 @@ class CallsResource(SyncAPIResource):
         """
         List calls managed by your agents.
 
+        Returns a cursor-paginated list of calls across all of your agents, most recent
+        first.
+
         Args:
           cursor: Cursor for pagination.
 
@@ -127,6 +130,9 @@ class AsyncCallsResource(AsyncAPIResource):
     ) -> CallListResponse:
         """
         List calls managed by your agents.
+
+        Returns a cursor-paginated list of calls across all of your agents, most recent
+        first.
 
         Args:
           cursor: Cursor for pagination.

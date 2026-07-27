@@ -48,7 +48,12 @@ class AuthResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> None:
-        """Verify authentication with API key."""
+        """Check whether the `x-api-key` header contains a valid API key.
+
+        Returns
+        `204 No Content` when the key is valid and `401 Unauthorized` otherwise. Useful
+        as a lightweight connectivity and credential check.
+        """
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return self._get(
             "/v1/auth/verify",
@@ -89,7 +94,12 @@ class AsyncAuthResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> None:
-        """Verify authentication with API key."""
+        """Check whether the `x-api-key` header contains a valid API key.
+
+        Returns
+        `204 No Content` when the key is valid and `401 Unauthorized` otherwise. Useful
+        as a lightweight connectivity and credential check.
+        """
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return await self._get(
             "/v1/auth/verify",
