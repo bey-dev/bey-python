@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Union, Mapping
+from typing import TYPE_CHECKING, Any, Mapping
 from typing_extensions import Self, override
 
 import httpx
@@ -11,17 +11,21 @@ import httpx
 from . import _exceptions
 from ._qs import Querystring
 from ._types import (
-    NOT_GIVEN,
     Omit,
     Timeout,
     NotGiven,
     Transport,
     ProxiesTypes,
     RequestOptions,
+    not_given,
 )
-from ._utils import is_given, get_async_library
+from ._utils import (
+    is_given,
+    is_mapping_t,
+    get_async_library,
+)
+from ._compat import cached_property
 from ._version import __version__
-from .resources import auth, agent, calls, avatar, session
 from ._streaming import Stream as Stream, AsyncStream as AsyncStream
 from ._exceptions import APIStatusError, BeyondPresenceError
 from ._base_client import (
@@ -29,6 +33,11 @@ from ._base_client import (
     SyncAPIClient,
     AsyncAPIClient,
 )
+
+if TYPE_CHECKING:
+    from .resources import auth, calls
+    from .resources.auth import AuthResource, AsyncAuthResource
+    from .resources.calls import CallsResource, AsyncCallsResource
 
 __all__ = [
     "Timeout",
@@ -43,14 +52,6 @@ __all__ = [
 
 
 class BeyondPresence(SyncAPIClient):
-    agent: agent.AgentResource
-    auth: auth.AuthResource
-    avatar: avatar.AvatarResource
-    calls: calls.CallsResource
-    session: session.SessionResource
-    with_raw_response: BeyondPresenceWithRawResponse
-    with_streaming_response: BeyondPresenceWithStreamedResponse
-
     # client options
     api_key: str
 
@@ -59,7 +60,7 @@ class BeyondPresence(SyncAPIClient):
         *,
         api_key: str | None = None,
         base_url: str | httpx.URL | None = None,
-        timeout: Union[float, Timeout, None, NotGiven] = NOT_GIVEN,
+        timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
         default_query: Mapping[str, object] | None = None,
@@ -94,6 +95,15 @@ class BeyondPresence(SyncAPIClient):
         if base_url is None:
             base_url = f"https://api.bey.dev/"
 
+        custom_headers_env = os.environ.get("BEYOND_PRESENCE_CUSTOM_HEADERS")
+        if custom_headers_env is not None:
+            parsed: dict[str, str] = {}
+            for line in custom_headers_env.split("\n"):
+                colon = line.find(":")
+                if colon >= 0:
+                    parsed[line[:colon].strip()] = line[colon + 1 :].strip()
+            default_headers = {**parsed, **(default_headers if is_mapping_t(default_headers) else {})}
+
         super().__init__(
             version=__version__,
             base_url=base_url,
@@ -105,13 +115,25 @@ class BeyondPresence(SyncAPIClient):
             _strict_response_validation=_strict_response_validation,
         )
 
-        self.agent = agent.AgentResource(self)
-        self.auth = auth.AuthResource(self)
-        self.avatar = avatar.AvatarResource(self)
-        self.calls = calls.CallsResource(self)
-        self.session = session.SessionResource(self)
-        self.with_raw_response = BeyondPresenceWithRawResponse(self)
-        self.with_streaming_response = BeyondPresenceWithStreamedResponse(self)
+    @cached_property
+    def auth(self) -> AuthResource:
+        from .resources.auth import AuthResource
+
+        return AuthResource(self)
+
+    @cached_property
+    def calls(self) -> CallsResource:
+        from .resources.calls import CallsResource
+
+        return CallsResource(self)
+
+    @cached_property
+    def with_raw_response(self) -> BeyondPresenceWithRawResponse:
+        return BeyondPresenceWithRawResponse(self)
+
+    @cached_property
+    def with_streaming_response(self) -> BeyondPresenceWithStreamedResponse:
+        return BeyondPresenceWithStreamedResponse(self)
 
     @property
     @override
@@ -138,9 +160,9 @@ class BeyondPresence(SyncAPIClient):
         *,
         api_key: str | None = None,
         base_url: str | httpx.URL | None = None,
-        timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
+        timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.Client | None = None,
-        max_retries: int | NotGiven = NOT_GIVEN,
+        max_retries: int | NotGiven = not_given,
         default_headers: Mapping[str, str] | None = None,
         set_default_headers: Mapping[str, str] | None = None,
         default_query: Mapping[str, object] | None = None,
@@ -219,14 +241,6 @@ class BeyondPresence(SyncAPIClient):
 
 
 class AsyncBeyondPresence(AsyncAPIClient):
-    agent: agent.AsyncAgentResource
-    auth: auth.AsyncAuthResource
-    avatar: avatar.AsyncAvatarResource
-    calls: calls.AsyncCallsResource
-    session: session.AsyncSessionResource
-    with_raw_response: AsyncBeyondPresenceWithRawResponse
-    with_streaming_response: AsyncBeyondPresenceWithStreamedResponse
-
     # client options
     api_key: str
 
@@ -235,7 +249,7 @@ class AsyncBeyondPresence(AsyncAPIClient):
         *,
         api_key: str | None = None,
         base_url: str | httpx.URL | None = None,
-        timeout: Union[float, Timeout, None, NotGiven] = NOT_GIVEN,
+        timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
         default_query: Mapping[str, object] | None = None,
@@ -270,6 +284,15 @@ class AsyncBeyondPresence(AsyncAPIClient):
         if base_url is None:
             base_url = f"https://api.bey.dev/"
 
+        custom_headers_env = os.environ.get("BEYOND_PRESENCE_CUSTOM_HEADERS")
+        if custom_headers_env is not None:
+            parsed: dict[str, str] = {}
+            for line in custom_headers_env.split("\n"):
+                colon = line.find(":")
+                if colon >= 0:
+                    parsed[line[:colon].strip()] = line[colon + 1 :].strip()
+            default_headers = {**parsed, **(default_headers if is_mapping_t(default_headers) else {})}
+
         super().__init__(
             version=__version__,
             base_url=base_url,
@@ -281,13 +304,25 @@ class AsyncBeyondPresence(AsyncAPIClient):
             _strict_response_validation=_strict_response_validation,
         )
 
-        self.agent = agent.AsyncAgentResource(self)
-        self.auth = auth.AsyncAuthResource(self)
-        self.avatar = avatar.AsyncAvatarResource(self)
-        self.calls = calls.AsyncCallsResource(self)
-        self.session = session.AsyncSessionResource(self)
-        self.with_raw_response = AsyncBeyondPresenceWithRawResponse(self)
-        self.with_streaming_response = AsyncBeyondPresenceWithStreamedResponse(self)
+    @cached_property
+    def auth(self) -> AsyncAuthResource:
+        from .resources.auth import AsyncAuthResource
+
+        return AsyncAuthResource(self)
+
+    @cached_property
+    def calls(self) -> AsyncCallsResource:
+        from .resources.calls import AsyncCallsResource
+
+        return AsyncCallsResource(self)
+
+    @cached_property
+    def with_raw_response(self) -> AsyncBeyondPresenceWithRawResponse:
+        return AsyncBeyondPresenceWithRawResponse(self)
+
+    @cached_property
+    def with_streaming_response(self) -> AsyncBeyondPresenceWithStreamedResponse:
+        return AsyncBeyondPresenceWithStreamedResponse(self)
 
     @property
     @override
@@ -314,9 +349,9 @@ class AsyncBeyondPresence(AsyncAPIClient):
         *,
         api_key: str | None = None,
         base_url: str | httpx.URL | None = None,
-        timeout: float | Timeout | None | NotGiven = NOT_GIVEN,
+        timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.AsyncClient | None = None,
-        max_retries: int | NotGiven = NOT_GIVEN,
+        max_retries: int | NotGiven = not_given,
         default_headers: Mapping[str, str] | None = None,
         set_default_headers: Mapping[str, str] | None = None,
         default_query: Mapping[str, object] | None = None,
@@ -395,39 +430,79 @@ class AsyncBeyondPresence(AsyncAPIClient):
 
 
 class BeyondPresenceWithRawResponse:
+    _client: BeyondPresence
+
     def __init__(self, client: BeyondPresence) -> None:
-        self.agent = agent.AgentResourceWithRawResponse(client.agent)
-        self.auth = auth.AuthResourceWithRawResponse(client.auth)
-        self.avatar = avatar.AvatarResourceWithRawResponse(client.avatar)
-        self.calls = calls.CallsResourceWithRawResponse(client.calls)
-        self.session = session.SessionResourceWithRawResponse(client.session)
+        self._client = client
+
+    @cached_property
+    def auth(self) -> auth.AuthResourceWithRawResponse:
+        from .resources.auth import AuthResourceWithRawResponse
+
+        return AuthResourceWithRawResponse(self._client.auth)
+
+    @cached_property
+    def calls(self) -> calls.CallsResourceWithRawResponse:
+        from .resources.calls import CallsResourceWithRawResponse
+
+        return CallsResourceWithRawResponse(self._client.calls)
 
 
 class AsyncBeyondPresenceWithRawResponse:
+    _client: AsyncBeyondPresence
+
     def __init__(self, client: AsyncBeyondPresence) -> None:
-        self.agent = agent.AsyncAgentResourceWithRawResponse(client.agent)
-        self.auth = auth.AsyncAuthResourceWithRawResponse(client.auth)
-        self.avatar = avatar.AsyncAvatarResourceWithRawResponse(client.avatar)
-        self.calls = calls.AsyncCallsResourceWithRawResponse(client.calls)
-        self.session = session.AsyncSessionResourceWithRawResponse(client.session)
+        self._client = client
+
+    @cached_property
+    def auth(self) -> auth.AsyncAuthResourceWithRawResponse:
+        from .resources.auth import AsyncAuthResourceWithRawResponse
+
+        return AsyncAuthResourceWithRawResponse(self._client.auth)
+
+    @cached_property
+    def calls(self) -> calls.AsyncCallsResourceWithRawResponse:
+        from .resources.calls import AsyncCallsResourceWithRawResponse
+
+        return AsyncCallsResourceWithRawResponse(self._client.calls)
 
 
 class BeyondPresenceWithStreamedResponse:
+    _client: BeyondPresence
+
     def __init__(self, client: BeyondPresence) -> None:
-        self.agent = agent.AgentResourceWithStreamingResponse(client.agent)
-        self.auth = auth.AuthResourceWithStreamingResponse(client.auth)
-        self.avatar = avatar.AvatarResourceWithStreamingResponse(client.avatar)
-        self.calls = calls.CallsResourceWithStreamingResponse(client.calls)
-        self.session = session.SessionResourceWithStreamingResponse(client.session)
+        self._client = client
+
+    @cached_property
+    def auth(self) -> auth.AuthResourceWithStreamingResponse:
+        from .resources.auth import AuthResourceWithStreamingResponse
+
+        return AuthResourceWithStreamingResponse(self._client.auth)
+
+    @cached_property
+    def calls(self) -> calls.CallsResourceWithStreamingResponse:
+        from .resources.calls import CallsResourceWithStreamingResponse
+
+        return CallsResourceWithStreamingResponse(self._client.calls)
 
 
 class AsyncBeyondPresenceWithStreamedResponse:
+    _client: AsyncBeyondPresence
+
     def __init__(self, client: AsyncBeyondPresence) -> None:
-        self.agent = agent.AsyncAgentResourceWithStreamingResponse(client.agent)
-        self.auth = auth.AsyncAuthResourceWithStreamingResponse(client.auth)
-        self.avatar = avatar.AsyncAvatarResourceWithStreamingResponse(client.avatar)
-        self.calls = calls.AsyncCallsResourceWithStreamingResponse(client.calls)
-        self.session = session.AsyncSessionResourceWithStreamingResponse(client.session)
+        self._client = client
+
+    @cached_property
+    def auth(self) -> auth.AsyncAuthResourceWithStreamingResponse:
+        from .resources.auth import AsyncAuthResourceWithStreamingResponse
+
+        return AsyncAuthResourceWithStreamingResponse(self._client.auth)
+
+    @cached_property
+    def calls(self) -> calls.AsyncCallsResourceWithStreamingResponse:
+        from .resources.calls import AsyncCallsResourceWithStreamingResponse
+
+        return AsyncCallsResourceWithStreamingResponse(self._client.calls)
 
 
 Client = BeyondPresence
